@@ -1,0 +1,2100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dataগিরি — Statistics & Data Science Department</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cyan: #00f5ff;
+  --cyan-dim: #00c8d4;
+  --purple: #a020f0;
+  --purple-bright: #c855ff;
+  --yellow: #ffe600;
+  --bg: #000000;
+  --bg2: #030310;
+  --glass: rgba(0,245,255,0.04);
+  --glass-border: rgba(0,245,255,0.18);
+  --text: #cde6ff;
+  --text-dim: #7a9ec5;
+  --card-bg: rgba(0,10,30,0.7);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Rajdhani', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* ─── CUSTOM CURSOR ─── */
+#cursor {
+  position: fixed; width: 16px; height: 16px;
+  border: 2px solid var(--cyan); border-radius: 50%;
+  pointer-events: none; z-index: 99999;
+  transform: translate(-50%,-50%);
+  transition: width .15s, height .15s, background .15s;
+  mix-blend-mode: screen;
+}
+#cursor-trail {
+  position: fixed; width: 6px; height: 6px;
+  background: var(--purple-bright); border-radius: 50%;
+  pointer-events: none; z-index: 99998;
+  transform: translate(-50%,-50%);
+  filter: blur(2px);
+}
+body:hover #cursor { background: rgba(0,245,255,0.15); }
+
+/* ─── CANVAS ─── */
+#universe-canvas {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 0; pointer-events: none;
+}
+
+/* ─── GRID OVERLAY ─── */
+.grid-overlay {
+  position: fixed; top: 0; left: 0;
+  width: 100%; height: 100%; z-index: 1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(0,245,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,245,255,0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  animation: gridPulse 8s ease-in-out infinite;
+}
+@keyframes gridPulse {
+  0%,100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ─── NAVBAR ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 0 2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 64px;
+}
+.nav-logo {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.4rem; font-weight: 900;
+  background: linear-gradient(90deg, var(--cyan), var(--purple-bright));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: 2px; text-decoration: none;
+  text-shadow: none; filter: drop-shadow(0 0 12px var(--cyan));
+}
+.nav-links {
+  display: flex; gap: 0; list-style: none;
+}
+.nav-links li a {
+  color: var(--text-dim); text-decoration: none;
+  font-family: 'Share Tech Mono', monospace; font-size: .78rem;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  padding: .5rem .85rem; display: block;
+  position: relative; transition: color .3s;
+}
+.nav-links li a::after {
+  content: ''; position: absolute; bottom: 0; left: 50%; right: 50%;
+  height: 1px; background: var(--cyan);
+  transition: left .3s, right .3s;
+}
+.nav-links li a:hover { color: var(--cyan); }
+.nav-links li a:hover::after { left: .5rem; right: .5rem; }
+#audio-btn {
+  background: none; border: 1px solid var(--cyan);
+  color: var(--cyan); font-family: 'Share Tech Mono', monospace;
+  font-size: .7rem; letter-spacing: 1px; padding: .4rem .9rem;
+  cursor: pointer; border-radius: 2px;
+  transition: background .3s, color .3s;
+}
+#audio-btn:hover { background: var(--cyan); color: #000; }
+
+/* ─── MAIN WRAPPER ─── */
+main { position: relative; z-index: 10; }
+
+/* ─── HERO ─── */
+#home {
+  min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  text-align: center; padding: 2rem;
+  position: relative;
+}
+.hero-badge {
+  font-family: 'Share Tech Mono', monospace; font-size: .72rem;
+  letter-spacing: 4px; color: var(--cyan); text-transform: uppercase;
+  border: 1px solid rgba(0,245,255,0.3); padding: .4rem 1.2rem;
+  margin-bottom: 1.5rem; display: inline-block;
+  animation: fadeUp .8s .2s both;
+}
+.hero-title {
+  font-family: 'Orbitron', monospace; font-size: clamp(2.8rem, 8vw, 7rem);
+  font-weight: 900; line-height: 1.05; margin-bottom: 1rem;
+  animation: fadeUp .8s .4s both;
+}
+.hero-title .line1 {
+  display: block;
+  background: linear-gradient(135deg, var(--cyan) 0%, #fff 50%, var(--purple-bright) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 0 30px var(--cyan));
+}
+.hero-title .line2 {
+  display: block; font-size: 55%;
+  background: linear-gradient(90deg, var(--purple-bright), var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: 8px; margin-top: .3rem;
+}
+.hero-sub {
+  font-size: 1.1rem; color: var(--text-dim); max-width: 600px;
+  margin: 0 auto 2.5rem; line-height: 1.8; font-weight: 300;
+  animation: fadeUp .8s .6s both;
+}
+.hero-ctas { display: flex; gap: 1rem; justify-content: center; animation: fadeUp .8s .8s both; }
+.btn-primary {
+  background: linear-gradient(135deg, var(--cyan), var(--purple));
+  color: #000; font-family: 'Orbitron', monospace; font-size: .75rem;
+  font-weight: 700; letter-spacing: 2px; padding: .9rem 2rem;
+  border: none; border-radius: 2px; cursor: pointer;
+  text-decoration: none; display: inline-block;
+  box-shadow: 0 0 20px rgba(0,245,255,0.4);
+  transition: transform .2s, box-shadow .2s;
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0,245,255,0.7); }
+.btn-ghost {
+  background: transparent; color: var(--cyan);
+  font-family: 'Orbitron', monospace; font-size: .75rem;
+  font-weight: 700; letter-spacing: 2px; padding: .9rem 2rem;
+  border: 1px solid var(--cyan); border-radius: 2px; cursor: pointer;
+  text-decoration: none; display: inline-block;
+  transition: background .3s, color .3s;
+}
+.btn-ghost:hover { background: rgba(0,245,255,0.1); }
+
+.hero-stats {
+  display: flex; gap: 3rem; animation: fadeUp .8s 1s both;
+  margin-top: 4rem;
+  padding: 1.8rem 3rem;
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  background: rgba(0,10,30,0.5);
+  backdrop-filter: blur(12px);
+}
+.hstat { text-align: center; }
+.hstat-num {
+  font-family: 'Orbitron', monospace; font-size: 2rem; font-weight: 900;
+  color: var(--cyan); display: block;
+  text-shadow: 0 0 20px var(--cyan);
+}
+.hstat-label {
+  font-size: .75rem; color: var(--text-dim); letter-spacing: 2px; text-transform: uppercase;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── SECTION BASE ─── */
+section {
+  position: relative; z-index: 10;
+  padding: 6rem 2rem;
+}
+.section-inner { max-width: 1200px; margin: 0 auto; }
+.section-label {
+  font-family: 'Share Tech Mono', monospace; font-size: .7rem;
+  letter-spacing: 5px; color: var(--purple-bright); text-transform: uppercase;
+  margin-bottom: .5rem;
+}
+.section-title {
+  font-family: 'Orbitron', monospace; font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 700; margin-bottom: 1rem;
+  background: linear-gradient(90deg, #fff, var(--cyan));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.section-desc {
+  color: var(--text-dim); max-width: 600px; line-height: 1.8; font-size: 1.05rem;
+  margin-bottom: 3rem;
+}
+.divider {
+  width: 80px; height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  margin: 1rem 0 2rem; border-radius: 2px;
+}
+
+/* ─── GLASS CARD ─── */
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px);
+  border-radius: 8px; padding: 2rem;
+  position: relative; overflow: hidden;
+  transition: border-color .3s, transform .3s;
+}
+.glass-card::before {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(135deg, rgba(0,245,255,0.05), transparent);
+  pointer-events: none;
+}
+.glass-card:hover {
+  border-color: var(--cyan);
+  transform: translateY(-4px);
+  box-shadow: 0 0 30px rgba(0,245,255,0.1);
+}
+
+/* ─── ABOUT ─── */
+#about .about-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+}
+.about-visual {
+  display: flex; align-items: center; justify-content: center;
+  position: relative; min-height: 300px;
+}
+#mini-canvas { border-radius: 8px; }
+
+/* ─── COURSES ─── */
+.courses-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+.course-card {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px); border-radius: 8px; padding: 1.8rem;
+  transition: all .3s; position: relative; overflow: hidden;
+}
+.course-card::after {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--cyan), var(--purple));
+  transform: scaleX(0); transition: transform .3s; transform-origin: left;
+}
+.course-card:hover { border-color: var(--cyan); transform: translateY(-6px); }
+.course-card:hover::after { transform: scaleX(1); }
+.course-icon {
+  font-size: 2rem; margin-bottom: 1rem; display: block;
+  filter: drop-shadow(0 0 8px var(--cyan));
+}
+.course-code {
+  font-family: 'Share Tech Mono', monospace; font-size: .7rem;
+  color: var(--cyan); letter-spacing: 2px; margin-bottom: .4rem;
+}
+.course-name {
+  font-family: 'Orbitron', monospace; font-size: .95rem;
+  font-weight: 700; margin-bottom: .8rem; color: #fff;
+}
+.course-desc { font-size: .9rem; color: var(--text-dim); line-height: 1.7; }
+.course-tag {
+  display: inline-block; margin-top: 1rem; font-size: .65rem;
+  font-family: 'Share Tech Mono', monospace; letter-spacing: 1px;
+  padding: .2rem .6rem; border: 1px solid var(--purple);
+  color: var(--purple-bright); border-radius: 2px;
+}
+
+/* ─── FACULTY ─── */
+.faculty-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.5rem;
+}
+.faculty-card {
+  background: var(--card-bg); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px); border-radius: 8px; padding: 1.8rem;
+  text-align: center; transition: all .3s;
+}
+.faculty-card:hover { border-color: var(--purple-bright); transform: translateY(-5px); box-shadow: 0 0 25px rgba(160,32,240,0.2); }
+.faculty-avatar {
+  width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 1rem;
+  border: 2px solid var(--cyan); display: flex; align-items: center; justify-content: center;
+  font-size: 2rem; background: rgba(0,245,255,0.05);
+  box-shadow: 0 0 20px rgba(0,245,255,0.2);
+}
+.faculty-name { font-family: 'Orbitron', monospace; font-size: .85rem; font-weight: 700; margin-bottom: .3rem; }
+.faculty-role { font-size: .8rem; color: var(--purple-bright); margin-bottom: .5rem; font-family: 'Share Tech Mono', monospace; letter-spacing: 1px; }
+.faculty-spec { font-size: .8rem; color: var(--text-dim); line-height: 1.5; }
+
+/* ─── RESEARCH ─── */
+.research-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.research-card {
+  background: var(--card-bg); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(16px); border-radius: 8px; padding: 2rem;
+  transition: all .3s; position: relative;
+}
+.research-card:hover { border-color: var(--yellow); box-shadow: 0 0 25px rgba(255,230,0,0.1); transform: translateY(-4px); }
+.research-num {
+  font-family: 'Orbitron', monospace; font-size: 3rem; font-weight: 900;
+  color: rgba(0,245,255,0.1); position: absolute; top: 1rem; right: 1.5rem;
+}
+.research-tag { font-family: 'Share Tech Mono', monospace; font-size: .65rem; letter-spacing: 2px; color: var(--yellow); margin-bottom: .5rem; }
+.research-title { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; margin-bottom: .8rem; }
+.research-desc { font-size: .9rem; color: var(--text-dim); line-height: 1.7; }
+.research-bar { height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; margin-top: 1.5rem; overflow: hidden; }
+.research-bar-fill { height: 100%; background: linear-gradient(90deg, var(--cyan), var(--purple)); border-radius: 2px; animation: barGrow 2s ease-out forwards; }
+@keyframes barGrow { from { width: 0; } }
+
+/* ─── EVENTS ─── */
+.events-timeline { position: relative; padding-left: 2rem; }
+.events-timeline::before {
+  content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 1px;
+  background: linear-gradient(180deg, var(--cyan), var(--purple), transparent);
+}
+.event-item { position: relative; margin-bottom: 2.5rem; }
+.event-item::before {
+  content: ''; position: absolute; left: -2.38rem; top: .4rem;
+  width: 10px; height: 10px; border-radius: 50%;
+  border: 2px solid var(--cyan); background: var(--bg);
+  box-shadow: 0 0 12px var(--cyan);
+}
+.event-date { font-family: 'Share Tech Mono', monospace; font-size: .7rem; color: var(--cyan); letter-spacing: 2px; margin-bottom: .3rem; }
+.event-title { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; margin-bottom: .5rem; }
+.event-desc { font-size: .9rem; color: var(--text-dim); line-height: 1.6; }
+
+/* ─── STUDENTS ─── */
+.students-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1.2rem; }
+.student-card {
+  background: var(--card-bg); border: 1px solid var(--glass-border);
+  border-radius: 8px; padding: 1.5rem; text-align: center;
+  transition: all .3s;
+}
+.student-card:hover { border-color: var(--cyan); transform: scale(1.03); }
+.student-avatar { width: 60px; height: 60px; border-radius: 50%; margin: 0 auto .8rem; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; border: 1px solid var(--glass-border); }
+.student-name { font-family: 'Orbitron', monospace; font-size: .8rem; font-weight: 700; margin-bottom: .2rem; }
+.student-year { font-size: .75rem; color: var(--purple-bright); font-family: 'Share Tech Mono', monospace; }
+
+/* ─── FACILITIES ─── */
+.facilities-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.facility-card {
+  background: var(--card-bg); border: 1px solid var(--glass-border);
+  border-radius: 8px; padding: 2rem; text-align: center; transition: all .3s;
+}
+.facility-card:hover { border-color: var(--yellow); box-shadow: 0 0 25px rgba(255,230,0,0.1); }
+.facility-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.facility-name { font-family: 'Orbitron', monospace; font-size: .9rem; font-weight: 700; margin-bottom: .6rem; }
+.facility-desc { font-size: .85rem; color: var(--text-dim); line-height: 1.6; }
+
+/* ─── ALUMNI ─── */
+.alumni-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; }
+.alumni-card {
+  background: var(--card-bg); border: 1px solid var(--glass-border);
+  border-radius: 8px; padding: 1.8rem; transition: all .3s; display: flex; gap: 1rem; align-items: flex-start;
+}
+.alumni-card:hover { border-color: var(--cyan); transform: translateY(-4px); }
+.alumni-avatar { width: 50px; height: 50px; border-radius: 50%; border: 1px solid var(--cyan); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+.alumni-name { font-family: 'Orbitron', monospace; font-size: .85rem; font-weight: 700; margin-bottom: .2rem; }
+.alumni-batch { font-family: 'Share Tech Mono', monospace; font-size: .65rem; color: var(--cyan); letter-spacing: 1px; margin-bottom: .4rem; }
+.alumni-company { font-size: .8rem; color: var(--text-dim); }
+
+/* ─── CAREER ─── */
+.career-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; }
+.job-card {
+  background: var(--card-bg); border: 1px solid var(--glass-border);
+  border-radius: 8px; padding: 1.8rem; transition: all .3s; position: relative;
+}
+.job-card:hover { border-color: var(--purple-bright); transform: translateY(-4px); box-shadow: 0 0 30px rgba(160,32,240,0.15); }
+.job-company { font-family: 'Share Tech Mono', monospace; font-size: .7rem; color: var(--purple-bright); letter-spacing: 2px; margin-bottom: .4rem; }
+.job-title { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 700; margin-bottom: .6rem; }
+.job-tags { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: 1rem; }
+.job-tag { font-size: .65rem; font-family: 'Share Tech Mono', monospace; padding: .2rem .6rem; border: 1px solid rgba(0,245,255,0.3); color: var(--cyan); border-radius: 2px; }
+.job-salary { position: absolute; top: 1.5rem; right: 1.5rem; font-family: 'Orbitron', monospace; font-size: .75rem; color: var(--yellow); }
+.apply-btn {
+  display: inline-block; margin-top: 1.2rem; font-family: 'Share Tech Mono', monospace;
+  font-size: .7rem; letter-spacing: 2px; color: var(--cyan);
+  border: 1px solid var(--cyan); padding: .4rem 1rem; border-radius: 2px;
+  cursor: pointer; text-decoration: none; transition: background .3s, color .3s;
+}
+.apply-btn:hover { background: var(--cyan); color: #000; }
+
+/* ─── CONTACT ─── */
+.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
+.contact-form { display: flex; flex-direction: column; gap: 1rem; }
+.form-group { display: flex; flex-direction: column; gap: .4rem; }
+.form-label { font-family: 'Share Tech Mono', monospace; font-size: .7rem; color: var(--cyan); letter-spacing: 2px; }
+.form-input, .form-textarea {
+  background: rgba(0,245,255,0.04); border: 1px solid var(--glass-border);
+  color: var(--text); font-family: 'Rajdhani', sans-serif; font-size: 1rem;
+  padding: .8rem 1rem; border-radius: 4px; outline: none;
+  transition: border-color .3s;
+}
+.form-input:focus, .form-textarea:focus { border-color: var(--cyan); box-shadow: 0 0 12px rgba(0,245,255,0.15); }
+.form-textarea { height: 120px; resize: vertical; }
+.contact-info { display: flex; flex-direction: column; gap: 1.5rem; }
+.contact-item { display: flex; gap: 1rem; align-items: flex-start; }
+.contact-icon { font-size: 1.5rem; margin-top: .1rem; }
+.contact-label { font-family: 'Share Tech Mono', monospace; font-size: .7rem; color: var(--cyan); letter-spacing: 2px; margin-bottom: .2rem; }
+.contact-value { font-size: .95rem; color: var(--text-dim); }
+
+/* ─── FOOTER ─── */
+footer {
+  position: relative; z-index: 10; padding: 2rem;
+  border-top: 1px solid var(--glass-border);
+  text-align: center; background: rgba(0,0,0,0.8);
+}
+.footer-logo { font-family: 'Orbitron', monospace; font-size: 1rem; font-weight: 900; background: linear-gradient(90deg, var(--cyan), var(--purple-bright)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: .5rem; }
+.footer-text { font-size: .8rem; color: var(--text-dim); font-family: 'Share Tech Mono', monospace; }
+
+/* ─── AUDIO PANEL ─── */
+#audio-panel {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 2000;
+  background: rgba(0,10,30,0.9); border: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px); border-radius: 8px; padding: 1rem 1.2rem;
+  display: flex; align-items: center; gap: 1rem; min-width: 220px;
+}
+#vol-label { font-family: 'Share Tech Mono', monospace; font-size: .65rem; color: var(--cyan); letter-spacing: 1px; }
+#vol-slider { -webkit-appearance: none; width: 100px; height: 2px; background: rgba(0,245,255,0.2); border-radius: 2px; outline: none; cursor: pointer; }
+#vol-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 12px; height: 12px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan); }
+.vis-bars { display: flex; gap: 2px; align-items: flex-end; height: 20px; }
+.vis-bar { width: 3px; background: var(--purple-bright); border-radius: 2px; animation: visBounce .6s ease-in-out infinite alternate; }
+.vis-bar:nth-child(2) { animation-delay: .1s; }
+.vis-bar:nth-child(3) { animation-delay: .2s; }
+.vis-bar:nth-child(4) { animation-delay: .15s; }
+.vis-bar:nth-child(5) { animation-delay: .05s; }
+@keyframes visBounce {
+  from { height: 4px; }
+  to { height: 18px; }
+}
+#audio-panel.paused .vis-bar { animation-play-state: paused; }
+
+/* ─── SCROLL ANIMATIONS ─── */
+.reveal { opacity: 0; transform: translateY(40px); transition: opacity .7s, transform .7s; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ─── RIPPLE ─── */
+.ripple {
+  position: fixed; border-radius: 50%; pointer-events: none;
+  border: 1px solid rgba(0,245,255,0.4);
+  animation: rippleOut .8s ease-out forwards; z-index: 9997;
+  transform: translate(-50%,-50%);
+}
+@keyframes rippleOut {
+  from { width: 0; height: 0; opacity: 1; }
+  to { width: 120px; height: 120px; opacity: 0; }
+}
+
+/* ─── SEARCH ─── */
+#search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+#search-toggle-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .78rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: .5rem .85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+  transition: color .3s, border-color .3s;
+  border-radius: 2px;
+}
+#search-toggle-btn:hover { color: var(--cyan); }
+#search-toggle-btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; }
+
+/* expanded input */
+#search-input-container {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  overflow: hidden;
+  transition: width .35s cubic-bezier(.4,0,.2,1);
+  background: rgba(0,10,30,0.92);
+  border: 1px solid transparent;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  z-index: 200;
+}
+#search-input-container.open {
+  width: 280px;
+  border-color: var(--cyan);
+  box-shadow: 0 0 18px rgba(0,245,255,0.18);
+}
+#search-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .78rem;
+  letter-spacing: 1px;
+  padding: .5rem .8rem;
+  width: 100%;
+}
+#search-input::placeholder { color: var(--text-dim); }
+#search-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-dim);
+  cursor: pointer;
+  padding: .4rem .6rem;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  transition: color .2s;
+}
+#search-close-btn:hover { color: var(--cyan); }
+
+/* dropdown results */
+#search-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 360px;
+  max-height: 480px;
+  overflow-y: auto;
+  background: rgba(0,6,20,0.97);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  backdrop-filter: blur(24px);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 20px rgba(0,245,255,0.08);
+  z-index: 9999;
+  display: none;
+}
+#search-dropdown.show { display: block; }
+
+.search-category-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .6rem;
+  letter-spacing: 3px;
+  color: var(--purple-bright);
+  text-transform: uppercase;
+  padding: .7rem 1rem .3rem;
+  opacity: .7;
+}
+.search-result-item {
+  display: flex;
+  align-items: center;
+  gap: .85rem;
+  padding: .65rem 1rem;
+  cursor: pointer;
+  transition: background .2s;
+  border-bottom: 1px solid rgba(0,245,255,0.04);
+  text-decoration: none;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover, .search-result-item.highlighted {
+  background: rgba(0,245,255,0.07);
+}
+.sri-avatar {
+  width: 36px; height: 36px; border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; flex-shrink: 0;
+  background: rgba(0,10,30,0.6);
+  overflow: hidden;
+}
+.sri-avatar img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+.sri-icon {
+  width: 36px; height: 36px; border-radius: 6px;
+  border: 1px solid var(--glass-border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; flex-shrink: 0;
+  background: rgba(0,10,30,0.6);
+}
+.sri-body { flex: 1; min-width: 0; }
+.sri-name {
+  font-family: 'Orbitron', monospace;
+  font-size: .72rem; font-weight: 700;
+  color: #fff;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sri-meta {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .62rem; color: var(--text-dim);
+  margin-top: .15rem;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.sri-tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .55rem; letter-spacing: 1px;
+  padding: .15rem .4rem;
+  border: 1px solid var(--purple);
+  color: var(--purple-bright); border-radius: 2px;
+  flex-shrink: 0;
+}
+.search-no-results {
+  padding: 1.5rem 1rem;
+  text-align: center;
+  color: var(--text-dim);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: .75rem;
+  letter-spacing: 1px;
+}
+.search-highlight { color: var(--cyan); }
+
+/* scrollbar */
+#search-dropdown::-webkit-scrollbar { width: 4px; }
+#search-dropdown::-webkit-scrollbar-track { background: transparent; }
+#search-dropdown::-webkit-scrollbar-thumb { background: rgba(0,245,255,0.2); border-radius: 2px; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 768px) {
+  .nav-links { display: none; }
+  #about .about-grid, .research-grid, .contact-grid { grid-template-columns: 1fr; }
+  .facilities-grid { grid-template-columns: 1fr 1fr; }
+  .hero-stats { gap: 1.5rem; }
+  #search-input-container.open { width: 200px; }
+  #search-dropdown { width: 280px; right: -40px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Canvas Background -->
+<canvas id="universe-canvas"></canvas>
+<div class="grid-overlay"></div>
+
+<!-- Custom Cursor -->
+<div id="cursor"></div>
+<div id="cursor-trail"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#home" class="nav-logo">Dataগিরি</a>
+  <ul class="nav-links">
+    <li><a href="#home">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#courses">Courses</a></li>
+    <li><a href="#faculty">Faculty</a></li>
+    <li><a href="#students">Students</a></li>
+    <li><a href="#research">Research</a></li>
+    <li><a href="#facilities">Facilities</a></li>
+    <li><a href="#events">Events</a></li>
+    <li><a href="#alumni">Alumni</a></li>
+    <li><a href="#career">Career</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+
+  <!-- SEARCH -->
+  <div id="search-wrapper">
+    <button id="search-toggle-btn" title="Search" aria-label="Open search">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <span>Search</span>
+    </button>
+    <div id="search-input-container" role="search">
+      <input id="search-input" type="text" placeholder="Search people, courses, events…" autocomplete="off" aria-label="Search site">
+      <button id="search-close-btn" title="Close search" aria-label="Close search">✕</button>
+    </div>
+    <div id="search-dropdown" role="listbox" aria-label="Search suggestions"></div>
+  </div>
+
+  <button id="audio-btn" onclick="toggleAudio()">▶ ACTIVATE</button>
+</nav>
+
+<!-- AUDIO PANEL -->
+<div id="audio-panel" class="paused">
+  <div class="vis-bars">
+    <div class="vis-bar"></div>
+    <div class="vis-bar"></div>
+    <div class="vis-bar"></div>
+    <div class="vis-bar"></div>
+    <div class="vis-bar"></div>
+  </div>
+  <span id="vol-label">VOL</span>
+  <input type="range" id="vol-slider" min="0" max="1" step="0.01" value="0.4" oninput="setVol(this.value)">
+</div>
+
+<main>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-badge">◆ Islamic University Bangladesh ◆ Est. 1970</div>
+  <h1 class="hero-title">
+    <span class="line1">Dataগিরি</span>
+    <span class="line2">Statistics & Data Science</span>
+  </h1>
+  <p class="hero-sub">Enter a living universe where statistics breathes, data pulses, and intelligence emerges from the infinite fabric of numbers.</p>
+  <div class="hero-ctas">
+    <a href="#courses" class="btn-primary">Explore Programs</a>
+    <a href="#about" class="btn-ghost">Our Universe →</a>
+  </div>
+
+  <div class="hero-stats">
+    <div class="hstat"><span class="hstat-num" data-count="39">0</span><span class="hstat-label">Students</span></div>
+    <div class="hstat"><span class="hstat-num" data-count="1">0</span><span class="hstat-label">Faculty</span></div>
+    <div class="hstat"><span class="hstat-num" data-count="22">0</span><span class="hstat-label">Research Papers</span></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">// about the department</p>
+      <h2 class="section-title">A Living Data Intelligence</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="about-grid">
+      <div class="reveal" style="transition-delay:.1s">
+        <div class="glass-card" style="height:100%">
+          <p style="font-size:1.05rem;line-height:1.9;color:var(--text-dim);margin-bottom:1.5rem">
+            Statistics and Data Science is not just a department — it is a <span style="color:var(--cyan)">living ecosystem of data intelligence</span>. Founded on the belief that statistics is the language of reality, we train the next generation of data scientists, statisticians, and AI researchers.
+          </p>
+          <p style="font-size:1.05rem;line-height:1.9;color:var(--text-dim);margin-bottom:1.5rem">
+            Our curriculum bridges <span style="color:var(--purple-bright)">classical statistical theory</span> with cutting-edge machine learning, deep neural architectures, and real-world data engineering. We exist at the intersection of mathematics, computation, and human insight.
+          </p>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:2rem">
+            <div style="text-align:center;padding:1rem;border:1px solid var(--glass-border);border-radius:6px">
+              <div style="font-family:'Orbitron',monospace;font-size:1.8rem;color:var(--cyan);font-weight:900">BSc</div>
+              <div style="font-size:.8rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace">Statistics</div>
+            </div>
+            <div style="text-align:center;padding:1rem;border:1px solid var(--glass-border);border-radius:6px">
+              <div style="font-family:'Orbitron',monospace;font-size:1.8rem;color:var(--purple-bright);font-weight:900">MSc</div>
+              <div style="font-size:.8rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace">Data Science</div>
+            </div>
+            <div style="text-align:center;padding:1rem;border:1px solid var(--glass-border);border-radius:6px">
+              <div style="font-family:'Orbitron',monospace;font-size:1.8rem;color:var(--yellow);font-weight:900">MPhil</div>
+              <div style="font-size:.8rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace">Applied Stats</div>
+            </div>
+            <div style="text-align:center;padding:1rem;border:1px solid var(--glass-border);border-radius:6px">
+              <div style="font-family:'Orbitron',monospace;font-size:1.8rem;color:var(--cyan);font-weight:900">PhD</div>
+              <div style="font-size:.8rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace">Research</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal about-visual" style="transition-delay:.3s">
+        <canvas id="mini-canvas" width="400" height="380"></canvas>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COURSES -->
+<section id="courses" style="background:rgba(0,245,255,0.01)">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">// academic programs</p>
+      <h2 class="section-title">Course Curriculum</h2>
+      <div class="divider"></div>
+      <p class="section-desc">Structured learning pathways that evolve from fundamental statistical theory to advanced AI systems.</p>
+    </div>
+    <div class="courses-grid">
+      <div id="course-sds-1101" class="course-card reveal" style="transition-delay:.05s">
+        <span class="course-icon">📊</span>
+        <div class="course-code">SDS-1101</div>
+        <div class="course-name">Introduction to Statistics and Data Science</div>
+        <div class="course-desc">🔹Introduction to Statistics🔹Sources of Data🔹Preparation and processing🔹Data Organization and Presentation🔹Measures of Center🔹Measures of Variation🔹Moments and Measure of Position🔹Correlation🔹Introduction to Data Science🔹Tools and Tecniques used in Data Science</div>
+        <span class="course-tag">Core</span>
+      </div>
+      <div id="course-sds-1102" class="course-card reveal" style="transition-delay:.1s">
+        <span class="course-icon">🎲</span>
+        <div class="course-code">SDS-1102</div>
+        <div class="course-name">Elementary Probability</div>
+        <div class="course-desc">🔹Introduction🔹Probability🔹Random Variables🔹Mathematical Expectation🔹Generating Function🔹Univariate Discrete Probability Distribution🔹Univariate Continuous Probability Distribution</div>
+        <span class="course-tag">Core</span>
+      </div>
+      <div id="course-sds-1103" class="course-card reveal" style="transition-delay:.15s">
+        <span class="course-icon">🧮</span>
+        <div class="course-code">SDS-1103</div>
+        <div class="course-name">Matrix Algebra and Applications</div>
+        <div class="course-desc">🔹Vector and Vector Set🔹Vector Spaces🔹Determinants and Inverse a Matrix🔹Matrices🔹Invurse of a Matrix🔹System of Linear Equations🔹Generalized (g-inverses)🔹Quadratic forms🔹Matrices od special types🔹Applications in Statistics and Data Science</div>
+        <span class="course-tag">MAT</span>
+      </div>
+      <div id="course-sds-1104" class="course-card reveal" style="transition-delay:.2s">
+        <span class="course-icon">💰</span>
+        <div class="course-code">SDS-1104</div>
+        <div class="course-name">Principles of Economics</div>
+        <div class="course-desc">🔹The nature of the Economic Problem and Economic System🔹Demand and Supply🔹Consumer Behaviour🔹Theory of Production🔹Market Structure🔹Demand and Supply in Factor Markets🔹Basic Concepts of Macroeconomics🔹National Income Accounting🔹Consumption Function and Investment🔹Index Numbers🔹Money and Inflation🔹Short-Run Economic Fluctions</div>
+        <span class="course-tag">GED</span>
+      </div>
+      <div id="course-sds-1105" class="course-card reveal" style="transition-delay:.05s">
+        <span class="course-icon">📖</span>
+        <div class="course-code">SDS-1105</div>
+        <div class="course-name">Communicative English for Scientific Writing</div>
+        <div class="course-desc">🔹Communicative Grammar🔹Writing Skill🔹Reading Skill🔹Speaking Skill🔹Listening Skill</div>
+        <span class="course-tag">GED</span>
+      </div>
+      <div id="course-ncc-isbs" class="course-card reveal" style="transition-delay:.1s">
+        <span class="course-icon">🕌🇧🇩</span>
+        <div class="course-code">NCC-IS/BS</div>
+        <div class="course-name">Islamic Studies/Bangladesh Studies</div>
+        <div class="course-desc">🔹Islam🔹Bangladesh</div>
+        <span class="course-tag">GED</span>
+      </div>
+      <div id="course-sds-1106" class="course-card reveal" style="transition-delay:.15s">
+        <span class="course-icon">💻</span>
+        <div class="course-code">SDS-1106</div>
+        <div class="course-name">Lab I:Computer Fundamentals and Task Oriented Softwate</div>
+        <div class="course-desc">🔹Introduntion to Computers🔹Computer Hardware🔹Computer Software🔹Problem Solving Techniques using Computers🔹Data Representation and Number system🔹Networking🔹Task Oriented Software(Spreadsheet and Word Processing)🔹Powerpoint🔹Minitab</div>
+        <span class="course-tag">LAB</span>
+      </div>
+      <div id="course-sds-1107" class="course-card reveal" style="transition-delay:.2s">
+        <span class="course-icon">💻</span>
+        <div class="course-code">SDS-1107</div>
+        <div class="course-name">Lab II:Data analysing Using SPSS</div>
+        <div class="course-desc">🔹Introduction to SPSS Environment🔹Understanding SPSS Command🔹Working with SPSS Files</div>
+        <span class="course-tag">LAB</span>
+      </div>
+      <div id="course-sds-1108" class="course-card reveal" style="transition-delay:.05s">
+        <span class="course-icon">💻</span>
+        <div class="course-code">SDS-1108</div>
+        <div class="course-name">Lab III:Data analysing Using MS Excel and Minitab</div>
+        <div class="course-desc">🔹Working with MS Excel🔹Working with Minitab</div>
+        <span class="course-tag">LAB</span>
+      </div>
+      <div id="course-sds-1201" class="course-card reveal" style="transition-delay:.1s">
+        <span class="course-icon">🎲</span>
+        <div class="course-code">SDS-1201</div>
+        <div class="course-name">Probability Theory and Distributions</div>
+        <div class="course-desc">🔹Variate Transformation🔹Convergence🔹Univariate Discrete Probability Distributions🔹Univariate Continuous Probability Distributions🔹Bivariate Distributions🔹Family of Distributions</div>
+        <span class="course-tag">CORE</span>
+      </div>
+      <div id="course-sds-1202" class="course-card reveal" style="transition-delay:.15s">
+        <span class="course-icon">📊</span>
+        <div class="course-code">SDS-1202</div>
+        <div class="course-name">Sampling Distribution</div>
+        <div class="course-desc">🔹Preliminaries🔹Functions of Random Variables and Their Distribution🔹Central Sampling Distributions🔹Noncentral Sampling Distributions</div>
+        <span class="course-tag">CORE</span>
+      </div>  
+      <div id="course-sds-1203" class="course-card reveal" style="transition-delay:.2s">
+        <span class="course-icon">🧮</span>
+        <div class="course-code">SDS-1203</div>
+        <div class="course-name">Calculus I</div>
+        <div class="course-desc">🔹Functions,limits and Continuty🔹Derivatives🔹The Derivatives in Graphing And Applications🔹INTEGRATION🔹Applications of The Definite Integral in Geometry,Science</div>
+        <span class="course-tag">MAT</span>
+      </div>
+      <div id="course-sds-1204" class="course-card reveal" style="transition-delay:.05s">
+        <span class="course-icon">🔢</span>
+        <div class="course-code">SDS-1204</div>
+        <div class="course-name">Discrete Mathematics</div>
+        <div class="course-desc">🔹Mathematical Reasoning🔹Combinatorics🔹Algorithms and Their Efficiency</div>
+        <span class="course-tag">CORE</span>
+      </div>
+      <div id="course-sds-1205" class="course-card reveal" style="transition-delay:.1s">
+        <span class="course-icon">🔢</span>
+        <div class="course-code">SDS-1205</div>
+        <div class="course-name">Linear and Modern Algebra</div>
+        <div class="course-desc">🔹Linear Transformations🔹Congruence and Similarity of Matrices🔹Linear Functional and Dual Space🔹Inner Product Space🔹Inequalities🔹Summation of algebraic series🔹Theory of Equations</div>
+        <span class="course-tag">MAT</span>
+      </div>  
+      <div id="course-sds-1206" class="course-card reveal" style="transition-delay:.15s">
+        <span class="course-icon">💻</span>
+        <div class="course-code">SDS-1206</div>
+        <div class="course-name">Lab IV: Programming and Data Analysis Using C/C++</div>
+        <div class="course-desc">🔹Introduction to Programming🔹An Overview of C🔹File Management in C🔹Applications of C Programming in Data Analysis🔹C/C++ Topics🔹Algorithms on Graphs🔹Modeling Computation🔹Cryptography and Data Security</div>
+        <span class="course-tag">LAB</span>        
+      </div>
+      <div id="course-sds-1207" class="course-card reveal" style="transition-delay:.2s">
+        <span class="course-icon">💻</span>
+        <div class="course-code">SDS-1207</div>
+        <div class="course-name">Lab V: Probability and Sampling Distributions Lab</div>
+        <div class="course-desc">🔹Probability Theory🔹Sampling Distributions</div>
+        <span class="course-tag">LAB</span>        
+      </div>                     
+      <div id="course-sds-1208" class="course-card reveal" style="transition-delay:.05s">
+        <span class="course-icon">💻</span>
+        <div class="course-code">SDS-1208</div>
+        <div class="course-name">Lab VI: Calculus and Discrete Mathematics Lab</div>
+        <div class="course-desc">🔹Calculus🔹Discrete Mathematics</div>
+        <span class="course-tag">LAB</span>        
+      </div>
+      <div id="course-sds-1209" class="course-card reveal" style="transition-delay:.1s">
+        <span class="course-icon">🗣️</span>
+        <div class="course-code">SDS-1209</div>
+        <div class="course-name">Viva-Voce</div>
+        <div class="course-desc">🔹Presentation</div>
+        <span class="course-tag">VIVA</span>        
+      </div>    
+  </div>
+</section>
+
+<!-- FACULTY -->
+<section id="faculty">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">// the minds behind the mission</p>
+      <h2 class="section-title">Faculty Network</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="faculty-grid">
+      <div id="faculty-kamal-uddin" class="faculty-card reveal" style="transition-delay:.05s">
+        <div class="faculty-avatar">
+          <img src="Kamal.jpg" alt="Dr. Md. Kamal Uddin" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Dr. Md. Kamal Uddin</div>
+        <div class="faculty-role">Professor</div>
+        <div class="faculty-spec">Data Modeling and Inference</div>
+      </div>
+      <div id="faculty-mahbubur-rahman" class="faculty-card reveal" style="transition-delay:.1s">
+        <div class="faculty-avatar">
+          <img src="mahabubur.jpg" alt="Dr. Md. Mahbubur Rahman" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Dr. Md. Mahbubur Rahman</div>
+        <div class="faculty-role">Professor</div>
+        <div class="faculty-spec">Probability Modeling and Mathematical Statistics</div>
+      </div>
+      <div id="faculty-sazzad-hossain" class="faculty-card reveal" style="transition-delay:.15s">
+        <div class="faculty-avatar">
+          <img src="sazzad.jpg" alt="Dr. Md. Sazzad Hossain" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Dr. Md. Sazzad Hossain</div>
+        <div class="faculty-role">Professor</div>
+        <div class="faculty-spec">Mathematical Economics</div>
+      </div>
+      <div id="faculty-altaf-hossain" class="faculty-card reveal" style="transition-delay:.2s">
+        <div class="faculty-avatar">
+          <img src="altaf.jpg" alt="Altaf Hossain" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Altaf Hossain</div>
+        <div class="faculty-role">Associate Professor</div>
+        <div class="faculty-spec">Casual Analysis and Economics</div>
+      </div>
+      <div id="faculty-tahidur-rahman" class="faculty-card reveal" style="transition-delay:.25s">
+        <div class="faculty-avatar">
+          <img src="tahidur.jpeg" alt="Dr. Md. Tahidur Rahman" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Dr. Md. Tahidur Rahman</div>
+        <div class="faculty-role">Associate Professor</div>
+        <div class="faculty-spec">Biostatics and Public Health</div>
+      </div>
+      <div id="faculty-sohel-rana" class="faculty-card reveal" style="transition-delay:.05s">
+        <div class="faculty-avatar">
+          <img src="shohel.jpg" alt="Dr. Md. Sohel Rana" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Dr. Md. Sohel Rana</div>
+        <div class="faculty-role">Associate Professor</div>
+        <div class="faculty-spec">Probability Theory</div>
+      </div>
+            <div id="faculty-sifat-sony" class="faculty-card reveal" style="transition-delay:.1s">
+        <div class="faculty-avatar">
+          <img src="soni.jpg" alt="Mst. Sifat Muntaha Sony" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Mst. Sifat Muntaha Sony</div>
+        <div class="faculty-role">Associate Professor</div>
+        <div class="faculty-spec">Bio Statics</div>
+      </div>
+      <div id="faculty-matiur-molla" class="faculty-card reveal" style="transition-delay:.15s">
+        <div class="faculty-avatar">
+          <img src="matiur.jpg" alt="Md. Matiur Rahaman Molla" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Md. Matiur Rahaman Molla</div>
+        <div class="faculty-role">Associate Professor</div>
+        <div class="faculty-spec">Machine Learning</div>
+      </div>  
+      <div id="faculty-sharmin-sumy" class="faculty-card reveal" style="transition-delay:.2s">
+        <div class="faculty-avatar">
+          <img src="sumy.jpg" alt="Mst. Sharmin Akter Sumy" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Mst. Sharmin Akter Sumy</div>
+        <div class="faculty-role">Assistant Professor</div>
+        <div class="faculty-spec">Biostatics</div>
+      </div> 
+      <div id="faculty-yasin-parh" class="faculty-card reveal" style="transition-delay:.25s">
+        <div class="faculty-avatar">
+          <img src="parh.jpg" alt="Md. Yasin Ali Parh" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Md. Yasin Ali Parh</div>
+        <div class="faculty-role">Assistant Professor</div>
+        <div class="faculty-spec">Biostatics</div>
+      </div>  
+      <div id="faculty-sumon-biswas" class="faculty-card reveal" style="transition-delay:.05s">
+        <div class="faculty-avatar">
+          <img src="suman.jpeg" alt="Sumon Biswas" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Sumon Biswas</div>
+        <div class="faculty-role">Assistant Professor</div>
+        <div class="faculty-spec">Data Science</div>
+      </div>
+      <div id="faculty-silvia-khanam" class="faculty-card reveal" style="transition-delay:.1s">
+        <div class="faculty-avatar">
+          <img src="silvia.jpg" alt="Silvia Khanam" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">
+        </div>
+        <div class="faculty-name">Silvia Khanam</div>
+        <div class="faculty-role">Lecturer</div>
+        <div class="faculty-spec">Mathematical Statistics</div>
+      </div>                      
+    </div>
+  </div>
+</section>
+
+<!-- STUDENTS -->
+<section id="students" style="background:rgba(160,32,240,0.02)">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">// the data generation</p>
+      <h2 class="section-title">Student Community</h2>
+      <div class="divider"></div>
+      <p class="section-desc">39 Students across all programs — the next generation of data scientists shaping the future.</p>
+    </div>
+    <div class="students-grid">
+      <div id="student-shafi" class="student-card reveal" style="transition-delay:.05s"><div class="student-avatar"><img src="shafi.jpg" alt="Shafi" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Shafi</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-mohtasin" class="student-card reveal" style="transition-delay:.1s"><div class="student-avatar"><img src="mohtasin.png" alt="Mohtasin" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Mohtasin</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-sawon" class="student-card reveal" style="transition-delay:.15s"><div class="student-avatar"><img src="sawon.jpg" alt="Sawon" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Sawon</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-abdullah" class="student-card reveal" style="transition-delay:.2s"><div class="student-avatar"><img src="abdullah.jpg" alt="Abdullah" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Abdullah</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-minhaz" class="student-card reveal" style="transition-delay:.25s"><div class="student-avatar"><img src="minhaz.jpg" alt="Minhaz" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Minhaz</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-arin" class="student-card reveal" style="transition-delay:.05s"><div class="student-avatar"><img src="arin.jpg" alt="Arin" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Arin</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-imran" class="student-card reveal" style="transition-delay:.1s"><div class="student-avatar"><img src="imran.jpg" alt="Imran" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Imran</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-mahfuz" class="student-card reveal" style="transition-delay:.15s"><div class="student-avatar"><img src="mahfuz.jpg" alt="Mahfuz" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name">Mahfuz </div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-mizan" class="student-card reveal" style="transition-delay:.2s"><div class="student-avatar"><img src="mizan.jpg" alt="Mizan" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Mizan</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-nafis" class="student-card reveal" style="transition-delay:.25s"><div class="student-avatar"><img src="nafis.png" alt="Nafis" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Nafis</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-rafeeah" class="student-card reveal" style="transition-delay:.05s"><div class="student-avatar"><img src="rafeeah.jpg" alt="Rafeeah" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Rafeeah</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-maruf" class="student-card reveal" style="transition-delay:.1s"><div class="student-avatar"><img src="maruf.jpg" alt="Maruf" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Maruf</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-labib" class="student-card reveal" style="transition-delay:.15s"><div class="student-avatar"><img src="labib.jpg" alt="Labib" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Labib</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-symoon" class="student-card reveal" style="transition-delay:.2s"><div class="student-avatar"><img src="symoon.jpg" alt="Symoon" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Symoon</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-salehin" class="student-card reveal" style="transition-delay:.25s"><div class="student-avatar"><img src="salehin.jpg" alt="Salehin" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Salehin</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-anik" class="student-card reveal" style="transition-delay:.05s"><div class="student-avatar"><img src="anik.jpg" alt="Anik" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Anik</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-jobaear" class="student-card reveal" style="transition-delay:.1s"><div class="student-avatar"><img src="jobaear.jpg" alt="Jobaear" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Jobaear</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-akib" class="student-card reveal" style="transition-delay:.15s"><div class="student-avatar"><img src="akib.jpg" alt="Akib" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Akib</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-sojib" class="student-card reveal" style="transition-delay:.2s"><div class="student-avatar"><img src="sojib.jpg" alt="Sojib" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Sojib</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-nishat" class="student-card reveal" style="transition-delay:.25s"><div class="student-avatar"><img src="nishat.jpg" alt="Nishat" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Nishat</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-foysal" class="student-card reveal" style="transition-delay:.05s"><div class="student-avatar"><img src="foysal.jpg" alt="Foysal" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Foysal</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-soumik" class="student-card reveal" style="transition-delay:.1s"><div class="student-avatar"><img src="soumik.jpg" alt="Soumik" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Soumik</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-kasmiri" class="student-card reveal" style="transition-delay:.15s"><div class="student-avatar"><img src="prionty.jpg" alt="Kasmiri" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Kasmiri</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-shahadat" class="student-card reveal" style="transition-delay:.2s"><div class="student-avatar"><img src="shahadat.jpg" alt="Shahadat" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Shahadat</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-sadia" class="student-card reveal" style="transition-delay:.25s"><div class="student-avatar"><img src="mst.jpg" alt="Sadia" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Sadia</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-prottyasha" class="student-card reveal" style="transition-delay:.05s"><div class="student-avatar"><img src="prottyasha.jpg" alt="Prottyasha" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Prottyasha</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-nasir" class="student-card reveal" style="transition-delay:.1s"><div class="student-avatar"><img src="nasir.jpg" alt="Nasir" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Nasir</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-parvez" class="student-card reveal" style="transition-delay:.15s"><div class="student-avatar"><img src="parvez.jpg" alt="Parvez" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Parvez</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-rifat" class="student-card reveal" style="transition-delay:.2s"><div class="student-avatar"><img src="rifat.jpg" alt="Rifat" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Rifat</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-rasna" class="student-card reveal" style="transition-delay:.25s"><div class="student-avatar"><img src="rasna.jpg" alt="Rasna" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Rasna</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-promi" class="student-card reveal" style="transition-delay:.05s"><div class="student-avatar"><img src="promi.jpg" alt="Promi" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Promi</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-sarah" class="student-card reveal" style="transition-delay:.1s"><div class="student-avatar"><img src="sarah.jpg" alt="Sarah" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Sarah</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-sakib" class="student-card reveal" style="transition-delay:.15s"><div class="student-avatar"><img src="shadman.jpg" alt="Sakib" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Sakib</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-sumona" class="student-card reveal" style="transition-delay:.2s"><div class="student-avatar"><img src="sumona.jpg" alt="Sumona" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Sumona</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-sunjeeda" class="student-card reveal" style="transition-delay:.25s"><div class="student-avatar"><img src="sunjeeda.jpg" alt="Sunjeeda" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Sunjeeda</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-sneha" class="student-card reveal" style="transition-delay:.05s"><div class="student-avatar"><img src="sneha.jpg" alt="Sneha" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Sneha</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-rima" class="student-card reveal" style="transition-delay:.1s"><div class="student-avatar"><img src="rima.png" alt="Rima" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Rima</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-rezoan" class="student-card reveal" style="transition-delay:.15s"><div class="student-avatar"><img src="rezoan.jpg" alt="Rezoan" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Rezoan</div><div class="student-year">BSc SDS • 2024-25</div></div>
+      <div id="student-fatema" class="student-card reveal" style="transition-delay:.2s"><div class="student-avatar"><img src="fatema.png" alt="Fatema" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div><div class="student-name"> Fatema</div><div class="student-year">BSc SDS • 2024-25</div></div>
+    </div>
+    <div class="reveal" style="margin-top:2.5rem;display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;max-width:700px">
+      <div class="glass-card" style="padding:1.2rem;text-align:center">
+        <div style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--cyan);font-weight:900">39</div>
+        <div style="font-size:.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace">Clubs</div>
+      </div>
+      <div class="glass-card" style="padding:1.2rem;text-align:center">
+        <div style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--purple-bright);font-weight:900">0</div>
+        <div style="font-size:.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace">Hackathons Won</div>
+      </div>
+      <div class="glass-card" style="padding:1.2rem;text-align:center">
+        <div style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--yellow);font-weight:900">0</div>
+        <div style="font-size:.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace">Olympiad Medals</div>
+      </div>
+      <div class="glass-card" style="padding:1.2rem;text-align:center">
+        <div style="font-family:'Orbitron',monospace;font-size:1.5rem;color:var(--cyan);font-weight:900">25+</div>
+        <div style="font-size:.7rem;color:var(--text-dim);font-family:'Share Tech Mono',monospace">Startups</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESEARCH -->
+<section id="research">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">// frontier discoveries</p>
+      <h2 class="section-title">Research Clusters</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="research-grid">
+      <div id="research-federated-learning" class="research-card reveal" style="transition-delay:.05s">
+        <div class="research-num">01</div>
+        <div class="research-tag">ACTIVE RESEARCH</div>
+        <div class="research-title">Federated Learning in Clinical Data</div>
+        <div class="research-desc">Privacy-preserving distributed ML across hospital networks for early disease detection and drug discovery acceleration.</div>
+        <div class="research-bar"><div class="research-bar-fill" style="width:78%"></div></div>
+      </div>
+      <div id="research-causal-inference" class="research-card reveal" style="transition-delay:.1s">
+        <div class="research-num">02</div>
+        <div class="research-tag">PUBLISHED</div>
+        <div class="research-title">Causal Inference in Social Networks</div>
+        <div class="research-desc">Structural causal models to identify intervention effects in large-scale social media networks and behavioral economics.</div>
+        <div class="research-bar"><div class="research-bar-fill" style="width:95%"></div></div>
+      </div>
+      <div id="research-explainable-ai" class="research-card reveal" style="transition-delay:.15s">
+        <div class="research-num">03</div>
+        <div class="research-tag">ONGOING</div>
+        <div class="research-title">Explainable AI for Finance</div>
+        <div class="research-desc">Interpretable deep learning architectures for credit risk, fraud detection, and algorithmic trading decisions.</div>
+        <div class="research-bar"><div class="research-bar-fill" style="width:60%"></div></div>
+      </div>
+      <div id="research-climate-modeling" class="research-card reveal" style="transition-delay:.2s">
+        <div class="research-num">04</div>
+        <div class="research-tag">GRANT AWARDED</div>
+        <div class="research-title">Climate Data Modeling</div>
+        <div class="research-desc">Spatio-temporal Bayesian models for climate prediction, extreme event detection, and environmental impact assessment.</div>
+        <div class="research-bar"><div class="research-bar-fill" style="width:45%"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FACILITIES -->
+<section id="facilities" style="background:rgba(0,245,255,0.01)">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">// infrastructure</p>
+      <h2 class="section-title">Our Facilities</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="facilities-grid">
+      <div id="facility-computer-lab" class="facility-card reveal" style="transition-delay:.05s">
+        <div class="facility-icon">🖥️</div>
+        <div class="facility-name">Computer Lab</div>
+        <div class="facility-desc">64-node GPU cluster with NVIDIA A100s. 10PB distributed storage. 400Gbps interconnect. Available 24/7 for students and researchers.</div>
+      </div>
+      <div id="facility-seminar-library" class="facility-card reveal" style="transition-delay:.1s">
+        <div class="facility-icon">📚</div>
+        <div class="facility-name">Seminar Library</div>
+        <div class="facility-desc">Access to 50,000+ journals, IEEE, Springer, and Elsevier databases. JSTOR, arXiv, and specialized statistics archives.</div>
+      </div>
+      <div id="facility-ai-hub" class="facility-card reveal" style="transition-delay:.15s">
+        <div class="facility-icon">🔭</div>
+        <div class="facility-name">AI Research Hub</div>
+        <div class="facility-desc">Coming Soon</div>
+      </div>
+      <div id="facility-stats-lab" class="facility-card reveal" style="transition-delay:.2s">
+        <div class="facility-icon">🧪</div>
+        <div class="facility-name">Statistics Lab</div>
+        <div class="facility-desc">Coming Soon</div>
+      </div>
+      <div id="facility-innovation-studio" class="facility-card reveal" style="transition-delay:.25s">
+        <div class="facility-icon">🏆</div>
+        <div class="facility-name">Innovation Studio</div>
+        <div class="facility-desc">Coming Soon</div>
+      </div>
+      <div id="facility-cloud-sandbox" class="facility-card reveal" style="transition-delay:.3s">
+        <div class="facility-icon">🛰️</div>
+        <div class="facility-name">Cloud Sandbox</div>
+        <div class="facility-desc">Coming Soon</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section id="events">
+  <div class="section-inner" style="display:grid;grid-template-columns:1fr 1fr;gap:4rem">
+    <div>
+      <div class="reveal">
+        <p class="section-label">// upcoming</p>
+        <h2 class="section-title">Events</h2>
+        <div class="divider"></div>
+      </div>
+      <div class="events-timeline">
+        <div id="event-1st-science-festival" class="event-item reveal" style="transition-delay:.05s">
+          <div class="event-date">MAY 15, 2025</div>
+          <div class="event-title">1st IUSC National Science Festival-2025</div>
+          <div class="event-desc">48-hour competitive data science hackathon. Open to all students. ৳100,000 in prizes.</div>
+        </div>
+        <div id="event-2nd-science-festival" class="event-item reveal" style="transition-delay:.1s">
+          <div class="event-date">MAY 11, 2026</div>
+          <div class="event-title">2nd IUSC National Science Festival-2026</div>
+          <div class="event-desc">Organized by Islamic University Science Club (IUSC). Join the grand celebration of innovation, discovery, and scientific brilliance.</div>
+        </div>
+        <div id="event-summer-research" class="event-item reveal" style="transition-delay:.15s">
+          <div class="event-date">Coming soon</div>
+          <div class="event-title">Summer Research Showcase</div>
+          <div class="event-desc">Students present their research projects to an audience of industry leaders, alumni, and potential employers.</div>
+        </div>
+        <div id="event-orientation" class="event-item reveal" style="transition-delay:.2s">
+          <div class="event-date">Coming soon</div>
+          <div class="event-title">New Semester Orientation</div>
+          <div class="event-desc">Immersive onboarding for new students with lab tours, faculty meets, and the annual department group photo.</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="reveal" style="transition-delay:.1s">
+        <p class="section-label">// our impact</p>
+        <h2 class="section-title">By the Numbers</h2>
+        <div class="divider"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:1.2rem">
+        <div class="glass-card reveal" style="transition-delay:.15s">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.9rem;color:var(--text-dim)">Annual Research Output</span>
+            <span style="font-family:'Orbitron',monospace;color:var(--cyan);font-weight:700">320 Papers</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:.8rem"><div style="width:80%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple));border-radius:2px"></div></div>
+        </div>
+        <div class="glass-card reveal" style="transition-delay:.2s">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.9rem;color:var(--text-dim)">Industry Partnerships</span>
+            <span style="font-family:'Orbitron',monospace;color:var(--purple-bright);font-weight:700">65+</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:.8rem"><div style="width:65%;height:100%;background:linear-gradient(90deg,var(--purple),var(--purple-bright));border-radius:2px"></div></div>
+        </div>
+        <div class="glass-card reveal" style="transition-delay:.25s">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.9rem;color:var(--text-dim)">Grant Funding (Annual)</span>
+            <span style="font-family:'Orbitron',monospace;color:var(--yellow);font-weight:700">৳12M</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:.8rem"><div style="width:70%;height:100%;background:linear-gradient(90deg,var(--yellow),orange);border-radius:2px"></div></div>
+        </div>
+        <div class="glass-card reveal" style="transition-delay:.3s">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:.9rem;color:var(--text-dim)">International Collaborations</span>
+            <span style="font-family:'Orbitron',monospace;color:var(--cyan);font-weight:700">28 Countries</span>
+          </div>
+          <div style="height:2px;background:rgba(255,255,255,0.05);border-radius:2px;margin-top:.8rem"><div style="width:55%;height:100%;background:linear-gradient(90deg,var(--cyan),var(--purple-bright));border-radius:2px"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ALUMNI -->
+<section id="alumni" style="background:rgba(160,32,240,0.02)">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">// our legacy network</p>
+      <h2 class="section-title">Distinguished Alumni</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="alumni-grid">
+      <div id="alumni-md-nasif-hossain" class="alumni-card reveal" style="transition-delay:.05s">
+        <div class="alumni-avatar"><img src="nasif.jpg" alt="Nasif" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>
+        <div><div class="alumni-name">Md. Nasif Hossain</div><div class="alumni-batch">Batch 2009-10 • PhD</div><div class="alumni-company">Lecturer @ Department of Statistics, PUST</div></div>
+      </div>
+      <div id="alumni-sumon-biswas" class="alumni-card reveal" style="transition-delay:.1s">
+        <div class="alumni-avatar"><img src="suman.jpeg" alt="Sumon" style="width:100%; height:100%; object-fit:cover; border-radius:50%;"></div>
+        <div><div class="alumni-name">Sumon Biswas</div><div class="alumni-batch">Batch 2009-10 • PhD</div><div class="alumni-company">Assistant Professor @ Department of Statistics and Data Science, IU</div></div>
+      </div>      
+    </div>
+  </div>
+</section>
+
+<!-- CAREER -->
+<section id="career">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">// opportunities</p>
+      <h2 class="section-title">Career Portal</h2>
+      <div class="divider"></div>
+      <p class="section-desc">Exclusive job & internship listings from our 65+ industry partners. Fresh opportunities added weekly.</p>
+    </div>
+    <div class="career-grid">
+      <div class="job-card reveal" style="transition-delay:.05s">
+        <div class="job-company">GOOGLE</div>
+        <div class="job-title">Data Science Intern</div>
+        <div style="font-size:.85rem;color:var(--text-dim)">Work on large-scale data pipelines and ML model deployment across Google's products.</div>
+        <div class="job-salary">Paid</div>
+        <div class="job-tags"><span class="job-tag">Python</span><span class="job-tag">BigQuery</span><span class="job-tag">ML</span></div>
+        <a href="#contact" class="apply-btn">Apply →</a>
+      </div>
+      <div class="job-card reveal" style="transition-delay:.1s">
+        <div class="job-company">BRAC BANK</div>
+        <div class="job-title">Junior Data Analyst</div>
+        <div style="font-size:.85rem;color:var(--text-dim)">Credit risk modeling, customer segmentation, and fraud detection using statistical models.</div>
+        <div class="job-salary">৳45K/mo</div>
+        <div class="job-tags"><span class="job-tag">R</span><span class="job-tag">SQL</span><span class="job-tag">Excel</span></div>
+        <a href="#contact" class="apply-btn">Apply →</a>
+      </div>
+      <div class="job-card reveal" style="transition-delay:.15s">
+        <div class="job-company">SHAJGOJ LTD.</div>
+        <div class="job-title">ML Engineer</div>
+        <div style="font-size:.85rem;color:var(--text-dim)">Build recommendation systems and personalization engines for Bangladesh's largest e-commerce platform.</div>
+        <div class="job-salary">৳70K/mo</div>
+        <div class="job-tags"><span class="job-tag">TensorFlow</span><span class="job-tag">Spark</span><span class="job-tag">API</span></div>
+        <a href="#contact" class="apply-btn">Apply →</a>
+      </div>
+      <div class="job-card reveal" style="transition-delay:.2s">
+        <div class="job-company">WHO BANGLADESH</div>
+        <div class="job-title">Health Data Researcher</div>
+        <div style="font-size:.85rem;color:var(--text-dim)">Epidemiological modeling, clinical trial analysis, and public health data visualization.</div>
+        <div class="job-salary">UN Scale</div>
+        <div class="job-tags"><span class="job-tag">Stata</span><span class="job-tag">SAS</span><span class="job-tag">Epidemiology</span></div>
+        <a href="#contact" class="apply-btn">Apply →</a>
+      </div>
+      <div class="job-card reveal" style="transition-delay:.25s">
+        <div class="job-company">DATASTACK (YC)</div>
+        <div class="job-title">Research Intern</div>
+        <div style="font-size:.85rem;color:var(--text-dim)">Join the alumni-founded startup solving data observability with AI. Equity included.</div>
+        <div class="job-salary">Equity</div>
+        <div class="job-tags"><span class="job-tag">LLM</span><span class="job-tag">Python</span><span class="job-tag">MLOps</span></div>
+        <a href="#contact" class="apply-btn">Apply →</a>
+      </div>
+      <div class="job-card reveal" style="transition-delay:.3s">
+        <div class="job-company">CENTRAL BANK (BB)</div>
+        <div class="job-title">Statistical Officer</div>
+        <div style="font-size:.85rem;color:var(--text-dim)">Monetary policy analysis, macroeconomic forecasting, and national financial indicator modeling.</div>
+        <div class="job-salary">BCS Scale</div>
+        <div class="job-tags"><span class="job-tag">Econometrics</span><span class="job-tag">SPSS</span><span class="job-tag">Forecasting</span></div>
+        <a href="#contact" class="apply-btn">Apply →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" style="background:rgba(0,245,255,0.01)">
+  <div class="section-inner">
+    <div class="reveal">
+      <p class="section-label">// connect with us</p>
+      <h2 class="section-title">Contact</h2>
+      <div class="divider"></div>
+    </div>
+    <div class="contact-grid">
+      <div class="reveal" style="transition-delay:.1s">
+        <div class="glass-card">
+          <div class="contact-form">
+            <div style="font-family:'Orbitron',monospace;font-size:.9rem;font-weight:700;margin-bottom:1.5rem;color:var(--cyan)">Send a Message</div>
+            <div class="form-group">
+              <label class="form-label">FULL NAME</label>
+              <input class="form-input" type="text" placeholder="Your name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">EMAIL ADDRESS</label>
+              <input class="form-input" type="email" placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">SUBJECT</label>
+              <input class="form-input" type="text" placeholder="Inquiry about...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">MESSAGE</label>
+              <textarea class="form-textarea" placeholder="Your message here..."></textarea>
+            </div>
+            <button class="btn-primary" style="width:100%;margin-top:.5rem;border:none;font-size:.8rem" onclick="playClick()">TRANSMIT MESSAGE →</button>
+          </div>
+        </div>
+      </div>
+      <div class="reveal contact-info" style="transition-delay:.2s">
+        <div class="contact-item">
+          <div class="contact-icon">📍</div>
+          <div>
+            <div class="contact-label">LOCATION</div>
+            <div class="contact-value">Department of Statistics and Data Science, Islamic University, Bangladesh</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📧</div>
+          <div>
+            <div class="contact-label">EMAIL</div>
+            <div class="contact-value">technometrics16@gmail.com</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">📞</div>
+          <div>
+            <div class="contact-label">PHONE</div>
+            <div class="contact-value">+880-1604-367495</div>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-icon">🕐</div>
+          <div>
+            <div class="contact-label">OFFICE HOURS</div>
+            <div class="contact-value">Saturday – Wednesday: 9 AM – 4 PM</div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;display:flex;gap:1rem">
+          <a href="#" style="color:var(--cyan);font-size:.8rem;font-family:'Share Tech Mono',monospace;text-decoration:none;border:1px solid rgba(0,245,255,0.3);padding:.4rem .8rem;border-radius:2px">LinkedIn</a>
+          <a href="#" style="color:var(--purple-bright);font-size:.8rem;font-family:'Share Tech Mono',monospace;text-decoration:none;border:1px solid rgba(160,32,240,0.3);padding:.4rem .8rem;border-radius:2px">Twitter/X</a>
+          <a href="#" style="color:var(--yellow);font-size:.8rem;font-family:'Share Tech Mono',monospace;text-decoration:none;border:1px solid rgba(255,230,0,0.3);padding:.4rem .8rem;border-radius:2px">YouTube</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="footer-logo">Dataগিরি</div>
+  <p class="footer-text">© 2025 Statistics & Data Science Department · All Rights Reserved · Built in the Living Data Universe</p>
+</footer>
+
+<script>
+// ══════════════════════════════════════════
+//  UNIVERSE CANVAS — Neural Network + Particles
+// ══════════════════════════════════════════
+const canvas = document.getElementById('universe-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, mouse = { x: 0, y: 0 };
+
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+// Nodes
+const NODES = 90;
+const nodes = [];
+for (let i = 0; i < NODES; i++) {
+  nodes.push({
+    x: Math.random() * 1.4 - .2,
+    y: Math.random() * 1.4 - .2,
+    vx: (Math.random() - .5) * .0003,
+    vy: (Math.random() - .5) * .0003,
+    r: Math.random() * 2.5 + 1,
+    hovered: false,
+    pulse: Math.random() * Math.PI * 2,
+    type: Math.floor(Math.random() * 3),
+  });
+}
+
+// Digital rain
+const RAIN = [];
+for (let i = 0; i < 40; i++) {
+  RAIN.push({
+    x: Math.random(),
+    y: Math.random(),
+    speed: Math.random() * .0008 + .0003,
+    opacity: Math.random() * .15 + .03,
+    char: Math.floor(Math.random() * 10),
+    timer: 0,
+  });
+}
+
+// Floating graphs (mini scatter/line overlays)
+const GRAPHS = [
+  { x: .75, y: .2, w: .15, h: .1, type: 'scatter', pts: Array.from({length:12}, () => ({x:Math.random(),y:Math.random()})) },
+  { x: .08, y: .6, w: .12, h: .08, type: 'line', pts: Array.from({length:8}, (_,i) => ({x:i/7, y:Math.random()})) },
+  { x: .85, y: .7, w: .1, h: .09, type: 'bar', pts: Array.from({length:6}, () => Math.random()) },
+];
+
+// Pulses traveling along edges
+const pulses = [];
+function spawnPulse() {
+  const a = Math.floor(Math.random() * NODES);
+  let b;
+  let tries = 0;
+  do { b = Math.floor(Math.random() * NODES); tries++; } while (b === a && tries < 20);
+  const ax = nodes[a].x * W, ay = nodes[a].y * H;
+  const bx = nodes[b].x * W, by = nodes[b].y * H;
+  const d = Math.hypot(bx - ax, by - ay);
+  if (d < 220) pulses.push({ a, b, t: 0, speed: .012 + Math.random() * .01 });
+}
+
+let frame = 0;
+function draw() {
+  frame++;
+  ctx.clearRect(0, 0, W, H);
+
+  // Parallax offset
+  const px = (mouse.x / W - .5) * 30;
+  const py = (mouse.y / H - .5) * 20;
+
+  // Digital rain
+  RAIN.forEach(r => {
+    r.timer++;
+    if (r.timer % 15 === 0) r.char = Math.floor(Math.random() * 10);
+    r.y += r.speed;
+    if (r.y > 1.1) r.y = -.05;
+    ctx.fillStyle = `rgba(0,245,255,${r.opacity})`;
+    ctx.font = '11px Share Tech Mono, monospace';
+    ctx.fillText(String(r.char), r.x * W + px * .3, r.y * H + py * .3);
+  });
+
+  // Draw edges
+  for (let i = 0; i < NODES; i++) {
+    for (let j = i + 1; j < NODES; j++) {
+      const ax = nodes[i].x * W + px, ay = nodes[i].y * H + py;
+      const bx = nodes[j].x * W + px, by = nodes[j].y * H + py;
+      const d = Math.hypot(bx - ax, by - ay);
+      if (d < 180) {
+        const alpha = (1 - d / 180) * .25;
+        const hovered = nodes[i].hovered || nodes[j].hovered;
+        ctx.strokeStyle = hovered
+          ? `rgba(200,85,255,${alpha * 2})`
+          : `rgba(0,245,255,${alpha})`;
+        ctx.lineWidth = hovered ? 1.5 : .5;
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(bx, by); ctx.stroke();
+      }
+    }
+  }
+
+  // Pulse particles
+  if (frame % 8 === 0 && pulses.length < 30) spawnPulse();
+  for (let p = pulses.length - 1; p >= 0; p--) {
+    const pulse = pulses[p];
+    pulse.t += pulse.speed;
+    if (pulse.t >= 1) { pulses.splice(p, 1); continue; }
+    const ax = nodes[pulse.a].x * W + px, ay = nodes[pulse.a].y * H + py;
+    const bx = nodes[pulse.b].x * W + px, by = nodes[pulse.b].y * H + py;
+    const x = ax + (bx - ax) * pulse.t;
+    const y = ay + (by - ay) * pulse.t;
+    const grad = ctx.createRadialGradient(x, y, 0, x, y, 8);
+    grad.addColorStop(0, 'rgba(0,245,255,0.9)');
+    grad.addColorStop(1, 'rgba(160,32,240,0)');
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = grad; ctx.fill();
+  }
+
+  // Draw nodes
+  nodes.forEach(n => {
+    n.x += n.vx + Math.sin(frame * .002 + n.pulse) * .00005;
+    n.y += n.vy + Math.cos(frame * .002 + n.pulse) * .00005;
+    if (n.x < -.1) n.x = 1.1; if (n.x > 1.1) n.x = -.1;
+    if (n.y < -.1) n.y = 1.1; if (n.y > 1.1) n.y = -.1;
+
+    const nx = n.x * W + px, ny = n.y * H + py;
+    const mx = mouse.x, my = mouse.y;
+    const md = Math.hypot(nx - mx, ny - my);
+    n.hovered = md < 60;
+    const r = n.hovered ? n.r * 3 : n.r + Math.sin(frame * .05 + n.pulse) * .5;
+
+    const colors = ['#00f5ff', '#c855ff', '#ffe600'];
+    const color = colors[n.type];
+    const grad = ctx.createRadialGradient(nx, ny, 0, nx, ny, r * 4);
+    grad.addColorStop(0, color);
+    grad.addColorStop(1, 'transparent');
+    ctx.beginPath(); ctx.arc(nx, ny, r, 0, Math.PI * 2);
+    ctx.fillStyle = grad; ctx.fill();
+
+    if (n.hovered) {
+      ctx.beginPath(); ctx.arc(nx, ny, r * 5, 0, Math.PI * 2);
+      ctx.strokeStyle = `${color}44`; ctx.lineWidth = 1; ctx.stroke();
+    }
+  });
+
+  // Mini floating graphs
+  GRAPHS.forEach(g => {
+    const gx = g.x * W + px * .5, gy = g.y * H + py * .5;
+    const gw = g.w * W, gh = g.h * H;
+    ctx.strokeStyle = 'rgba(0,245,255,0.15)'; ctx.lineWidth = 1;
+    ctx.strokeRect(gx, gy, gw, gh);
+
+    if (g.type === 'scatter') {
+      g.pts.forEach(pt => {
+        ctx.beginPath(); ctx.arc(gx + pt.x * gw, gy + pt.y * gh, 2, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(0,245,255,0.5)'; ctx.fill();
+      });
+    } else if (g.type === 'line') {
+      ctx.beginPath();
+      g.pts.forEach((pt, i) => {
+        const lx = gx + pt.x * gw, ly = gy + pt.y * gh;
+        i === 0 ? ctx.moveTo(lx, ly) : ctx.lineTo(lx, ly);
+      });
+      ctx.strokeStyle = 'rgba(200,85,255,0.5)'; ctx.lineWidth = 1.5; ctx.stroke();
+    } else {
+      const bw = gw / g.pts.length * .7;
+      g.pts.forEach((h, i) => {
+        const bx2 = gx + i * (gw / g.pts.length) + 2;
+        const bh = h * gh;
+        ctx.fillStyle = `rgba(255,230,0,0.35)`;
+        ctx.fillRect(bx2, gy + gh - bh, bw, bh);
+      });
+    }
+  });
+
+  requestAnimationFrame(draw);
+}
+draw();
+
+// Mini canvas (about section)
+const mc = document.getElementById('mini-canvas');
+const mctx = mc.getContext('2d');
+const mnodes = Array.from({length:30}, () => ({
+  x: Math.random(), y: Math.random(),
+  vx: (Math.random()-.5)*.001, vy: (Math.random()-.5)*.001,
+  r: Math.random()*2+1, pulse: Math.random()*Math.PI*2,
+}));
+function drawMini() {
+  mctx.clearRect(0,0,400,380);
+  mctx.fillStyle='rgba(0,10,30,0.95)'; mctx.fillRect(0,0,400,380);
+  mnodes.forEach(n => {
+    n.x += n.vx; n.y += n.vy;
+    if(n.x<0||n.x>1) n.vx*=-1; if(n.y<0||n.y>1) n.vy*=-1;
+  });
+  for(let i=0;i<mnodes.length;i++) for(let j=i+1;j<mnodes.length;j++) {
+    const ax=mnodes[i].x*400,ay=mnodes[i].y*380;
+    const bx=mnodes[j].x*400,by=mnodes[j].y*380;
+    const d=Math.hypot(bx-ax,by-ay);
+    if(d<120){
+      mctx.strokeStyle=`rgba(0,245,255,${(1-d/120)*.4})`;
+      mctx.lineWidth=.5;
+      mctx.beginPath();mctx.moveTo(ax,ay);mctx.lineTo(bx,by);mctx.stroke();
+    }
+  }
+  mnodes.forEach(n=>{
+    const nx=n.x*400,ny=n.y*380;
+    const g=mctx.createRadialGradient(nx,ny,0,nx,ny,6);
+    g.addColorStop(0,'#00f5ff'); g.addColorStop(1,'transparent');
+    mctx.beginPath();mctx.arc(nx,ny,n.r,0,Math.PI*2);
+    mctx.fillStyle=g;mctx.fill();
+  });
+  requestAnimationFrame(drawMini);
+}
+drawMini();
+
+// ══════════════════════════════════════════
+//  CURSOR
+// ══════════════════════════════════════════
+const cursor = document.getElementById('cursor');
+const trail = document.getElementById('cursor-trail');
+let tx=0,ty=0,cx=0,cy=0;
+document.addEventListener('mousemove', e => {
+  mouse.x = e.clientX; mouse.y = e.clientY;
+  cursor.style.left = e.clientX + 'px'; cursor.style.top = e.clientY + 'px';
+  tx = e.clientX; ty = e.clientY;
+});
+function animTrail() {
+  cx += (tx-cx)*.12; cy += (ty-cy)*.12;
+  trail.style.left = cx+'px'; trail.style.top = cy+'px';
+  requestAnimationFrame(animTrail);
+}
+animTrail();
+
+document.addEventListener('click', e => {
+  createRipple(e.clientX, e.clientY);
+  playClick();
+});
+
+function createRipple(x, y) {
+  const r = document.createElement('div');
+  r.className = 'ripple';
+  r.style.left = x+'px'; r.style.top = y+'px';
+  document.body.appendChild(r);
+  setTimeout(() => r.remove(), 800);
+}
+
+// ══════════════════════════════════════════
+//  AUDIO
+// ══════════════════════════════════════════
+let audioCtx, gainNode, playing = false;
+let oscillators = [];
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  gainNode = audioCtx.createGain();
+  gainNode.gain.value = 0.4;
+  gainNode.connect(audioCtx.destination);
+}
+
+function createSynthwave() {
+  // Ambient drone base
+  const freqs = [55, 110, 165, 220];
+  freqs.forEach(f => {
+    const osc = audioCtx.createOscillator();
+    const g = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.value = f;
+    g.gain.value = 0.02;
+    osc.connect(g); g.connect(gainNode);
+    osc.start(); oscillators.push({osc,g});
+  });
+  // Pulse beat
+  function pulse() {
+    if (!playing) return;
+    const osc = audioCtx.createOscillator();
+    const env = audioCtx.createGain();
+    osc.type = 'square'; osc.frequency.value = 110;
+    env.gain.setValueAtTime(0, audioCtx.currentTime);
+    env.gain.linearRampToValueAtTime(0.015, audioCtx.currentTime + .02);
+    env.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + .3);
+    osc.connect(env); env.connect(gainNode);
+    osc.start(); osc.stop(audioCtx.currentTime + .35);
+    setTimeout(pulse, 600);
+  }
+  pulse();
+  // Melody arpeggios
+  const mel = [220, 277, 330, 440, 554, 440, 330, 277];
+  let mi = 0;
+  function arp() {
+    if (!playing) return;
+    const osc = audioCtx.createOscillator();
+    const env = audioCtx.createGain();
+    osc.type = 'triangle'; osc.frequency.value = mel[mi % mel.length]; mi++;
+    env.gain.setValueAtTime(0, audioCtx.currentTime);
+    env.gain.linearRampToValueAtTime(0.012, audioCtx.currentTime + .05);
+    env.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + .5);
+    osc.connect(env); env.connect(gainNode);
+    osc.start(); osc.stop(audioCtx.currentTime + .55);
+    setTimeout(arp, 375 + Math.random() * 100);
+  }
+  arp();
+}
+
+function toggleAudio() {
+  initAudio();
+  const btn = document.getElementById('audio-btn');
+  const panel = document.getElementById('audio-panel');
+  if (!playing) {
+    audioCtx.resume();
+    playing = true;
+    createSynthwave();
+    btn.textContent = '⏸ PAUSE';
+    panel.classList.remove('paused');
+  } else {
+    playing = false;
+    oscillators.forEach(o => { try { o.osc.stop(); } catch(e){} });
+    oscillators = [];
+    audioCtx.suspend();
+    btn.textContent = '▶ ACTIVATE';
+    panel.classList.add('paused');
+  }
+}
+
+function setVol(v) {
+  if (gainNode) gainNode.gain.value = parseFloat(v);
+}
+
+function playHover() {
+  if (!audioCtx || !playing) return;
+  const osc = audioCtx.createOscillator();
+  const env = audioCtx.createGain();
+  osc.type = 'sine'; osc.frequency.value = 880;
+  env.gain.setValueAtTime(0, audioCtx.currentTime);
+  env.gain.linearRampToValueAtTime(0.008, audioCtx.currentTime + .01);
+  env.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + .12);
+  osc.connect(env); env.connect(gainNode);
+  osc.start(); osc.stop(audioCtx.currentTime + .15);
+}
+
+function playClick() {
+  if (!audioCtx || !playing) return;
+  [440, 660, 880].forEach((f, i) => {
+    const osc = audioCtx.createOscillator();
+    const env = audioCtx.createGain();
+    osc.type = 'sine'; osc.frequency.value = f;
+    const t = audioCtx.currentTime + i * .05;
+    env.gain.setValueAtTime(0, t);
+    env.gain.linearRampToValueAtTime(0.015, t + .01);
+    env.gain.exponentialRampToValueAtTime(0.0001, t + .2);
+    osc.connect(env); env.connect(gainNode);
+    osc.start(t); osc.stop(t + .25);
+  });
+}
+
+// ══════════════════════════════════════════
+//  SEARCH SYSTEM
+// ══════════════════════════════════════════
+const SEARCH_DATA = [
+  // ── NAV SECTIONS ──
+  { type: 'section', category: 'Navigation', icon: '🏠', name: 'Home', meta: 'Back to top', href: '#home', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: 'ℹ️', name: 'About', meta: 'Department overview & programs', href: '#about', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: '📚', name: 'Courses', meta: 'Academic curriculum & programs', href: '#courses', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: '👨‍🏫', name: 'Faculty', meta: 'Professors & lecturers', href: '#faculty', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: '🎓', name: 'Students', meta: '39 students across all programs', href: '#students', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: '🔬', name: 'Research', meta: 'Research clusters & projects', href: '#research', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: '🏛️', name: 'Facilities', meta: 'Labs, library & infrastructure', href: '#facilities', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: '📅', name: 'Events', meta: 'Upcoming events & statistics', href: '#events', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: '🌟', name: 'Alumni', meta: 'Distinguished graduates', href: '#alumni', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: '💼', name: 'Career', meta: 'Job placements & opportunities', href: '#career', tag: 'PAGE' },
+  { type: 'section', category: 'Navigation', icon: '📬', name: 'Contact', meta: 'Get in touch with us', href: '#contact', tag: 'PAGE' },
+
+  // ── FACULTY ──
+  { type: 'faculty', category: 'Faculty', avatar: 'Kamal.jpg', name: 'Dr. Md. Kamal Uddin', meta: 'Professor · Data Modeling and Inference', href: '#faculty-kamal-uddin', tag: 'PROF' },
+  { type: 'faculty', category: 'Faculty', avatar: 'mahabubur.jpg', name: 'Dr. Md. Mahbubur Rahman', meta: 'Professor · Probability Modeling & Mathematical Statistics', href: '#faculty-mahbubur-rahman', tag: 'PROF' },
+  { type: 'faculty', category: 'Faculty', avatar: 'sazzad.jpg', name: 'Dr. Md. Sazzad Hossain', meta: 'Professor · Mathematical Economics', href: '#faculty-sazzad-hossain', tag: 'PROF' },
+  { type: 'faculty', category: 'Faculty', avatar: 'altaf.jpg', name: 'Altaf Hossain', meta: 'Associate Professor · Casual Analysis and Economics', href: '#faculty-altaf-hossain', tag: 'ASSOC' },
+  { type: 'faculty', category: 'Faculty', avatar: 'tahidur.jpeg', name: 'Dr. Md. Tahidur Rahman', meta: 'Associate Professor · Biostatistics and Public Health', href: '#faculty-tahidur-rahman', tag: 'ASSOC' },
+  { type: 'faculty', category: 'Faculty', avatar: 'shohel.jpg', name: 'Dr. Md. Sohel Rana', meta: 'Associate Professor · Probability Theory', href: '#faculty-sohel-rana', tag: 'ASSOC' },
+  { type: 'faculty', category: 'Faculty', avatar: 'soni.jpg', name: 'Mst. Sifat Muntaha Sony', meta: 'Associate Professor · Bio Statistics', href: '#faculty-sifat-sony', tag: 'ASSOC' },
+  { type: 'faculty', category: 'Faculty', avatar: 'matiur.jpg', name: 'Md. Matiur Rahaman Molla', meta: 'Associate Professor · Machine Learning', href: '#faculty-matiur-molla', tag: 'ASSOC' },
+  { type: 'faculty', category: 'Faculty', avatar: 'sumy.jpg', name: 'Mst. Sharmin Akter Sumy', meta: 'Assistant Professor · Biostatistics', href: '#faculty-sharmin-sumy', tag: 'ASST' },
+  { type: 'faculty', category: 'Faculty', avatar: 'parh.jpg', name: 'Md. Yasin Ali Parh', meta: 'Assistant Professor · Biostatistics', href: '#faculty-yasin-parh', tag: 'ASST' },
+  { type: 'faculty', category: 'Faculty', avatar: 'suman.jpeg', name: 'Sumon Biswas', meta: 'Assistant Professor · Data Science', href: '#faculty-sumon-biswas', tag: 'ASST' },
+  { type: 'faculty', category: 'Faculty', avatar: 'silvia.jpg', name: 'Silvia Khanam', meta: 'Lecturer · Mathematical Statistics', href: '#faculty-silvia-khanam', tag: 'LEC' },
+
+  // ── STUDENTS ──
+  { type: 'student', category: 'Students', avatar: 'shafi.jpg', name: 'Shafi', meta: 'BSc SDS · Batch 2024-25', href: '#student-shafi', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'mohtasin.png', name: 'Mohtasin', meta: 'BSc SDS · Batch 2024-25', href: '#student-mohtasin', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'sawon.jpg', name: 'Sawon', meta: 'BSc SDS · Batch 2024-25', href: '#student-sawon', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'abdullah.jpg', name: 'Abdullah', meta: 'BSc SDS · Batch 2024-25', href: '#student-abdullah', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'minhaz.jpg', name: 'Minhaz', meta: 'BSc SDS · Batch 2024-25', href: '#student-minhaz', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'arin.jpg', name: 'Arin', meta: 'BSc SDS · Batch 2024-25', href: '#student-arin', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'imran.jpg', name: 'Imran', meta: 'BSc SDS · Batch 2024-25', href: '#student-imran', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'mahfuz.jpg', name: 'Mahfuz', meta: 'BSc SDS · Batch 2024-25', href: '#student-mahfuz', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'mizan.jpg', name: 'Mizan', meta: 'BSc SDS · Batch 2024-25', href: '#student-mizan', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'nafis.png', name: 'Nafis', meta: 'BSc SDS · Batch 2024-25', href: '#student-nafis', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'rafeeah.jpg', name: 'Rafeeah', meta: 'BSc SDS · Batch 2024-25', href: '#student-rafeeah', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'maruf.jpg', name: 'Maruf', meta: 'BSc SDS · Batch 2024-25', href: '#student-maruf', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'labib.jpg', name: 'Labib', meta: 'BSc SDS · Batch 2024-25', href: '#student-labib', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'symoon.jpg', name: 'Symoon', meta: 'BSc SDS · Batch 2024-25', href: '#student-symoon', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'salehin.jpg', name: 'Salehin', meta: 'BSc SDS · Batch 2024-25', href: '#student-salehin', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'anik.jpg', name: 'Anik', meta: 'BSc SDS · Batch 2024-25', href: '#student-anik', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'jobaear.jpg', name: 'Jobaear', meta: 'BSc SDS · Batch 2024-25', href: '#student-jobaear', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'akib.jpg', name: 'Akib', meta: 'BSc SDS · Batch 2024-25', href: '#student-akib', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'sojib.jpg', name: 'Sojib', meta: 'BSc SDS · Batch 2024-25', href: '#student-sojib', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'nishat.jpg', name: 'Nishat', meta: 'BSc SDS · Batch 2024-25', href: '#student-nishat', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'foysal.jpg', name: 'Foysal', meta: 'BSc SDS · Batch 2024-25', href: '#student-foysal', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'soumik.jpg', name: 'Soumik', meta: 'BSc SDS · Batch 2024-25', href: '#student-soumik', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'prionty.jpg', name: 'Kasmiri', meta: 'BSc SDS · Batch 2024-25', href: '#student-kasmiri', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'shahadat.jpg', name: 'Shahadat', meta: 'BSc SDS · Batch 2024-25', href: '#student-shahadat', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'mst.jpg', name: 'Sadia', meta: 'BSc SDS · Batch 2024-25', href: '#student-sadia', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'prottyasha.jpg', name: 'Prottyasha', meta: 'BSc SDS · Batch 2024-25', href: '#student-prottyasha', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'nasir.jpg', name: 'Nasir', meta: 'BSc SDS · Batch 2024-25', href: '#student-nasir', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'parvez.jpg', name: 'Parvez', meta: 'BSc SDS · Batch 2024-25', href: '#student-parvez', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'rifat.jpg', name: 'Rifat', meta: 'BSc SDS · Batch 2024-25', href: '#student-rifat', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'rasna.jpg', name: 'Rasna', meta: 'BSc SDS · Batch 2024-25', href: '#student-rasna', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'promi.jpg', name: 'Promi', meta: 'BSc SDS · Batch 2024-25', href: '#student-Promi', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'sarah.jpg', name: 'Sarah', meta: 'BSc SDS · Batch 2024-25', href: '#student-sarah', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'shadman.jpg', name: 'Sakib', meta: 'BSc SDS · Batch 2024-25', href: '#student-sakib', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'sumona.jpg', name: 'Sumona', meta: 'BSc SDS · Batch 2024-25', href: '#student-sumona', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'sunjeeda.jpg', name: 'Sunjeeda', meta: 'BSc SDS · Batch 2024-25', href: '#student-sunjeeda', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'sneha.jpg', name: 'Sneha', meta: 'BSc SDS · Batch 2024-25', href: '#student-sneha', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'rima.png', name: 'Rima', meta: 'BSc SDS · Batch 2024-25', href: '#student-rima', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'rezoan.jpg', name: 'Rezoan', meta: 'BSc SDS · Batch 2024-25', href: '#student-rezoan', tag: 'BSC' },
+  { type: 'student', category: 'Students', avatar: 'fatema.png', name: 'Fatema', meta: 'BSc SDS · Batch 2024-25', href: '#student-fatema', tag: 'BSC' },
+
+  // ── COURSES ──
+  { type: 'course', category: 'Courses', icon: '📊', name: 'Introduction to Statistics and Data Science', meta: 'SDS-1101 · Core', href: '#course-sds-1101', tag: 'CORE' },
+  { type: 'course', category: 'Courses', icon: '🎲', name: 'Elementary Probability', meta: 'SDS-1102 · Core', href: '#course-sds-1102', tag: 'CORE' },
+  { type: 'course', category: 'Courses', icon: '🧮', name: 'Matrix Algebra and Applications', meta: 'SDS-1103 · Mat', href: '#course-sds-1103', tag: 'MAT' },
+  { type: 'course', category: 'Courses', icon: '💰', name: 'Principles of Economics', meta: 'SDS-1104 · GED', href: '#course-sds-1104', tag: 'GED' },
+  { type: 'course', category: 'Courses', icon: '📖', name: 'Communicative English for Scientific Writing', meta: 'SDS-1105 · GED', href: '#course-sds-1105', tag: 'GED' },
+  { type: 'course', category: 'Courses', icon: '🕌', name: 'Islamic Studies / Bangladesh Studies', meta: 'NCC-IS/BS · GED', href: '#course-ncc-isbs', tag: 'GED' },
+  { type: 'course', category: 'Courses', icon: '💻', name: 'Lab I: Computer Fundamentals', meta: 'SDS-1106 · Lab', href: '#course-sds-1106', tag: 'LAB' },
+  { type: 'course', category: 'Courses', icon: '💻', name: 'Lab II: Data Analysis Using SPSS', meta: 'SDS-1107 · Lab', href: '#course-sds-1107', tag: 'LAB' },
+  { type: 'course', category: 'Courses', icon: '💻', name: 'Lab III: Data Analysis Using MS Excel and Minitab', meta: 'SDS-1108 · Lab', href: '#course-sds-1108', tag: 'LAB' },
+  { type: 'course', category: 'Courses', icon: '🎲', name: 'Probability Theory and Distributions', meta: 'SDS-1201 · CORE', href: '#course-sds-1201', tag: 'CORE' },  
+  { type: 'course', category: 'Courses', icon: '📊', name: 'Sampling Distributions', meta: 'SDS-1202 · CORE', href: '#course-sds-1202', tag: 'CORE' },
+  { type: 'course', category: 'Courses', icon: '🧮', name: 'Calculus I', meta: 'SDS-1203 · MAT', href: '#course-sds-1203', tag: 'MAT' },
+  { type: 'course', category: 'Courses', icon: '🔢', name: 'Discrete Mathematics · CORE', href: '#course-sds-1204', tag: 'CORE' },
+  { type: 'course', category: 'Courses', icon: '🔢', name: 'Linear and Modern Algebra · MAT', href: '#course-sds-1205', tag: 'MAT' },
+  { type: 'course', category: 'Courses', icon: '💻', name: 'Lab IV: Programming and Data Analysis Using C/C++ · LAB', href: '#course-sds-1206', tag: 'LAB' },
+  { type: 'course', category: 'Courses', icon: '💻', name: 'Lab V: Probability and Sampling Distributions Lab · LAB', href: '#course-sds-1207', tag: 'LAB' },
+  { type: 'course', category: 'Courses', icon: '💻', name: 'Lab VI: Calculus and Discrete Mathematics Lab · LAB', href: '#course-sds-1208', tag: 'LAB' },
+  { type: 'course', category: 'Courses', icon: '🗣️', name: 'Viva-Voce · LAB', href: '#course-sds-1209', tag: 'VIVA' },
+
+  // ── RESEARCH ──
+  { type: 'research', category: 'Research', icon: '🧬', name: 'Federated Learning in Clinical Data', meta: 'Active Research · Privacy-preserving ML', href: '#research-federated-learning', tag: 'ACTIVE' },
+  { type: 'research', category: 'Research', icon: '🌐', name: 'Causal Inference in Social Networks', meta: 'Published · Structural Causal Models', href: '#research-causal-inference', tag: 'PUB' },
+  { type: 'research', category: 'Research', icon: '💹', name: 'Explainable AI for Finance', meta: 'Ongoing · Interpretable Deep Learning', href: '#research-explainable-ai', tag: 'ONGOING' },
+  { type: 'research', category: 'Research', icon: '🌍', name: 'Climate Data Modeling', meta: 'Grant Awarded · Spatio-temporal Bayesian', href: '#research-climate-modeling', tag: 'GRANT' },
+
+  // ── EVENTS ──
+  { type: 'event', category: 'Events', icon: '🏆', name: '1st IUSC National Science Festival-2025', meta: 'May 15, 2025 · ৳100,000 in prizes', href: '#event-1st-science-festival', tag: 'EVENT' },
+  { type: 'event', category: 'Events', icon: '🤖', name: '2nd IUSC National Science Festival-2026', meta: 'MAY 11, 2026 · International speakers', href: '#event-2nd-science-festival', tag: 'EVENT' },
+  { type: 'event', category: 'Events', icon: '🔭', name: 'Summer Research Showcase', meta: 'Coming soon · Student presentations', href: '#event-summer-research', tag: 'EVENT' },
+  { type: 'event', category: 'Events', icon: '🎓', name: 'New Semester Orientation', meta: 'Coming soon · Onboarding', href: '#event-orientation', tag: 'EVENT' },
+
+  // ── ALUMNI ──
+  { type: 'alumni', category: 'Alumni', avatar: 'nasif.jpg', name: 'Md. Nasif Hossain', meta: 'Batch 2009-10 · Lecturer @ Department of Statistics, PUST', href: '#alumni-md-nasif-hossain', tag: 'ALUMNI' },
+  { type: 'alumni', category: 'Alumni', avatar: 'suman.jpeg', name: 'Sumon Biswas', meta: 'Batch 2009-10 · Assistant Professor @ Department of Statistics and Data Science, IU', href: '#alumni-sumon-biswas', tag: 'ALUMNI' },
+
+  // ── FACILITIES ──
+  { type: 'facility', category: 'Facilities', icon: '🖥️', name: 'Computer Lab', meta: '64-node GPU cluster · NVIDIA A100s', href: '#facility-computer-lab', tag: 'LAB' },
+  { type: 'facility', category: 'Facilities', icon: '📚', name: 'Seminar Library', meta: '50,000+ journals · IEEE, Springer, Elsevier', href: '#facility-seminar-library', tag: 'LIB' },
+  { type: 'facility', category: 'Facilities', icon: '🔭', name: 'AI Research Hub', meta: 'Coming Soon', href: '#facility-ai-hub', tag: 'HUB' },
+  { type: 'facility', category: 'Facilities', icon: '🧪', name: 'Statistics Lab', meta: 'Coming Soon', href: '#facility-stats-lab', tag: 'LAB' },
+  { type: 'facility', category: 'Facilities', icon: '🏆', name: 'Innovation Studio', meta: 'Coming Soon', href: '#facility-innovation-studio', tag: 'STUDIO' },
+  { type: 'facility', category: 'Facilities', icon: '🛰️', name: 'Cloud Sandbox', meta: 'Coming Soon', href: '#facility-cloud-sandbox', tag: 'CLOUD' },
+];
+
+function buildAvatarEl(item) {
+  if (item.avatar) {
+    return `<div class="sri-avatar"><img src="${item.avatar}" alt="${item.name}" onerror="this.parentElement.innerHTML='${item.icon||'👤'}'"></div>`;
+  }
+  if (item.type === 'section' || item.type === 'course' || item.type === 'research' || item.type === 'event' || item.type === 'alumni' || item.type === 'facility') {
+    return `<div class="sri-icon">${item.icon}</div>`;
+  }
+  return `<div class="sri-avatar">${item.icon || '👤'}</div>`;
+}
+
+function highlight(text, query) {
+  if (!query) return text;
+  const escaped = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return text.replace(new RegExp(`(${escaped})`, 'gi'), '<span class="search-highlight">$1</span>');
+}
+
+function doSearch(raw) {
+  const q = raw.trim().toLowerCase();
+  if (!q) return [];
+  return SEARCH_DATA.filter(item =>
+    item.name.toLowerCase().includes(q) ||
+    (item.meta && item.meta.toLowerCase().includes(q)) ||
+    (item.category && item.category.toLowerCase().includes(q)) ||
+    (item.tag && item.tag.toLowerCase().includes(q))
+  ).slice(0, 12);
+}
+
+function renderDropdown(results, query) {
+  const dd = document.getElementById('search-dropdown');
+  if (!results.length) {
+    dd.innerHTML = `<div class="search-no-results">// NO RESULTS FOUND<br><span style="opacity:.5">Try a name, course, or keyword</span></div>`;
+    dd.classList.add('show');
+    return;
+  }
+
+  // Group by category
+  const groups = {};
+  results.forEach(r => {
+    if (!groups[r.category]) groups[r.category] = [];
+    groups[r.category].push(r);
+  });
+
+  let html = '';
+  Object.entries(groups).forEach(([cat, items]) => {
+    html += `<div class="search-category-label">${cat}</div>`;
+    items.forEach(item => {
+      html += `<a class="search-result-item" href="${item.href}" role="option">
+        ${buildAvatarEl(item)}
+        <div class="sri-body">
+          <div class="sri-name">${highlight(item.name, query)}</div>
+          <div class="sri-meta">${highlight(item.meta || '', query)}</div>
+        </div>
+        <span class="sri-tag">${item.tag}</span>
+      </a>`;
+    });
+  });
+  dd.innerHTML = html;
+  dd.classList.add('show');
+}
+
+function closeSearch() {
+  const container = document.getElementById('search-input-container');
+  const dd = document.getElementById('search-dropdown');
+  const input = document.getElementById('search-input');
+  container.classList.remove('open');
+  dd.classList.remove('show');
+  input.value = '';
+  setTimeout(() => { input.blur(); }, 350);
+}
+
+function openSearch() {
+  const container = document.getElementById('search-input-container');
+  const input = document.getElementById('search-input');
+  container.classList.add('open');
+  setTimeout(() => input.focus(), 360);
+}
+
+document.getElementById('search-toggle-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  const container = document.getElementById('search-input-container');
+  if (container.classList.contains('open')) {
+    closeSearch();
+  } else {
+    openSearch();
+  }
+});
+
+document.getElementById('search-close-btn').addEventListener('click', e => {
+  e.stopPropagation();
+  closeSearch();
+});
+
+document.getElementById('search-input').addEventListener('input', e => {
+  const q = e.target.value;
+  const dd = document.getElementById('search-dropdown');
+  if (!q.trim()) { dd.classList.remove('show'); return; }
+  renderDropdown(doSearch(q), q.trim());
+});
+
+// Keyboard navigation
+document.getElementById('search-input').addEventListener('keydown', e => {
+  const dd = document.getElementById('search-dropdown');
+  const items = dd.querySelectorAll('.search-result-item');
+  const highlighted = dd.querySelector('.search-result-item.highlighted');
+  let idx = highlighted ? Array.from(items).indexOf(highlighted) : -1;
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    if (highlighted) highlighted.classList.remove('highlighted');
+    idx = (idx + 1) % items.length;
+    items[idx] && items[idx].classList.add('highlighted');
+    items[idx] && items[idx].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    if (highlighted) highlighted.classList.remove('highlighted');
+    idx = (idx - 1 + items.length) % items.length;
+    items[idx] && items[idx].classList.add('highlighted');
+    items[idx] && items[idx].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    if (highlighted) {
+      e.preventDefault();
+      const href = highlighted.getAttribute('href');
+      if (href && href.startsWith('#')) {
+        const target = document.querySelector(href);
+        if (target) {
+          const navHeight = document.querySelector('nav').offsetHeight;
+          const top = target.getBoundingClientRect().top + window.scrollY - navHeight - 20;
+          window.scrollTo({ top, behavior: 'smooth' });
+          target.style.transition = 'box-shadow 0.3s, border-color 0.3s';
+          target.style.boxShadow = '0 0 0 2px var(--cyan), 0 0 30px rgba(0,245,255,0.4)';
+          target.style.borderColor = 'var(--cyan)';
+          setTimeout(() => { target.style.boxShadow = ''; target.style.borderColor = ''; }, 2000);
+        }
+      }
+      closeSearch();
+    }
+  } else if (e.key === 'Escape') {
+    closeSearch();
+  }
+});
+
+// Click on result — navigate then close
+document.getElementById('search-dropdown').addEventListener('click', e => {
+  const item = e.target.closest('.search-result-item');
+  if (item) {
+    e.preventDefault();
+    const href = item.getAttribute('href');
+    if (href && href.startsWith('#')) {
+      const target = document.querySelector(href);
+      if (target) {
+        const navHeight = document.querySelector('nav').offsetHeight;
+        const top = target.getBoundingClientRect().top + window.scrollY - navHeight - 20;
+        window.scrollTo({ top, behavior: 'smooth' });
+        // highlight the card briefly
+        target.style.transition = 'box-shadow 0.3s, border-color 0.3s';
+        target.style.boxShadow = '0 0 0 2px var(--cyan), 0 0 30px rgba(0,245,255,0.4)';
+        target.style.borderColor = 'var(--cyan)';
+        setTimeout(() => {
+          target.style.boxShadow = '';
+          target.style.borderColor = '';
+        }, 2000);
+      }
+    }
+    setTimeout(closeSearch, 100);
+  }
+});
+
+// Close dropdown when clicking outside
+document.addEventListener('click', e => {
+  const wrapper = document.getElementById('search-wrapper');
+  if (!wrapper.contains(e.target)) closeSearch();
+});
+
+
+
+// ══════════════════════════════════════════
+//  COUNTER ANIMATION
+// ══════════════════════════════════════════
+function animateCounter(el, target, duration = 2000) {
+  let start = null;
+  function step(timestamp) {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - progress, 3);
+    el.textContent = Math.floor(eased * target);
+    if (progress < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+}
+
+const counters = document.querySelectorAll('[data-count]');
+const counterObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      animateCounter(e.target, parseInt(e.target.dataset.count));
+      counterObs.unobserve(e.target);
+    }
+  });
+}, { threshold: .5 });
+counters.forEach(c => counterObs.observe(c));
+
+// ══════════════════════════════════════════
+//  SCROLL REVEAL
+// ══════════════════════════════════════════
+const reveals = document.querySelectorAll('.reveal');
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) { e.target.classList.add('visible'); }
+  });
+}, { threshold: .1 });
+reveals.forEach(r => revealObs.observe(r));
+</script>
+</body>
+</html>
